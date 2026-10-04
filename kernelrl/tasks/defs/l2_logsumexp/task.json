@@ -1,0 +1,36 @@
+{
+  "id": "l2_logsumexp",
+  "level": 2,
+  "name": "Row logsumexp",
+  "description": "Numerically stable logsumexp over the last dimension. Output has shape [M].",
+  "signature": "run(x: Tensor[M, N]) -> Tensor[M]",
+  "dim_names": [
+    "M",
+    "N"
+  ],
+  "dtypes": [
+    "float32"
+  ],
+  "tolerance": {
+    "float32": {
+      "atol": 0.0001,
+      "rtol": 0.0001
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "N": 1024
+    },
+    {
+      "M": 4096,
+      "N": 4096
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "row",
+    "reduction"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 2 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

@@ -1,0 +1,35 @@
+{
+  "id": "l1_vector_add",
+  "level": 1,
+  "name": "Elementwise add",
+  "description": "Compute out = x + y elementwise.",
+  "signature": "run(x: Tensor[M, N], y: Tensor[M, N]) -> Tensor[M, N]",
+  "dim_names": [
+    "M",
+    "N"
+  ],
+  "dtypes": [
+    "float32"
+  ],
+  "tolerance": {
+    "float32": {
+      "atol": 1e-05,
+      "rtol": 1e-05
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "N": 1024
+    },
+    {
+      "M": 4096,
+      "N": 4096
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "elementwise"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 1 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

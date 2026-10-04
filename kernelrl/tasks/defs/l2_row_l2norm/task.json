@@ -1,0 +1,36 @@
+{
+  "id": "l2_row_l2norm",
+  "level": 2,
+  "name": "Row L2 normalize",
+  "description": "Normalize each row to unit L2 norm: out = x / max(||x||_2, 1e-12).",
+  "signature": "run(x: Tensor[M, N]) -> Tensor[M, N]",
+  "dim_names": [
+    "M",
+    "N"
+  ],
+  "dtypes": [
+    "float32"
+  ],
+  "tolerance": {
+    "float32": {
+      "atol": 0.0001,
+      "rtol": 0.0001
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "N": 1024
+    },
+    {
+      "M": 4096,
+      "N": 4096
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "row",
+    "norm"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 2 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

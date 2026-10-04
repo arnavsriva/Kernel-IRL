@@ -1,0 +1,41 @@
+{
+  "id": "l3_batched_matmul",
+  "level": 3,
+  "name": "Batched matmul",
+  "description": "Batched matrix multiply out[i] = a[i] @ b[i]. float16 inputs/output, accumulate in float32.",
+  "signature": "run(a: Tensor[B, M, K], b: Tensor[B, K, N]) -> Tensor[B, M, N]",
+  "dim_names": [
+    "B",
+    "M",
+    "N",
+    "K"
+  ],
+  "dtypes": [
+    "float16"
+  ],
+  "tolerance": {
+    "float16": {
+      "atol": 0.01,
+      "rtol": 0.01
+    }
+  },
+  "public_shapes": [
+    {
+      "B": 8,
+      "M": 512,
+      "N": 512,
+      "K": 512
+    },
+    {
+      "B": 32,
+      "M": 256,
+      "N": 256,
+      "K": 128
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "matmul"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 3 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

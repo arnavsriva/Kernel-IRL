@@ -1,0 +1,64 @@
+{
+  "shapes": [
+    {
+      "dims": {
+        "B": 1,
+        "H": 1,
+        "S": 1,
+        "D": 64
+      },
+      "bench": false,
+      "note": "single token"
+    },
+    {
+      "dims": {
+        "B": 1,
+        "H": 2,
+        "S": 127,
+        "D": 64
+      },
+      "bench": false,
+      "note": "odd length"
+    },
+    {
+      "dims": {
+        "B": 2,
+        "H": 4,
+        "S": 1000,
+        "D": 64
+      },
+      "bench": true,
+      "note": "non-power-of-2 length"
+    },
+    {
+      "dims": {
+        "B": 1,
+        "H": 4,
+        "S": 513,
+        "D": 128
+      },
+      "bench": false,
+      "note": "head dim 128"
+    },
+    {
+      "dims": {
+        "B": 3,
+        "H": 2,
+        "S": 257,
+        "D": 32
+      },
+      "bench": false,
+      "note": "head dim 32"
+    },
+    {
+      "dims": {
+        "B": 1,
+        "H": 8,
+        "S": 4096,
+        "D": 64
+      },
+      "bench": true,
+      "note": "long sequence"
+    }
+  ]
+}

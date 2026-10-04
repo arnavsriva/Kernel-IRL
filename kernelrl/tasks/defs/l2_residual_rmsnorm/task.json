@@ -1,0 +1,37 @@
+{
+  "id": "l2_residual_rmsnorm",
+  "level": 2,
+  "name": "Residual add + RMSNorm",
+  "description": "Compute h = x + residual, then RMSNorm(h) with weight and eps=1e-6 over the last dimension. Return only the normalized output. Compute in float32; inputs/output bfloat16.",
+  "signature": "run(x: Tensor[M, N], residual: Tensor[M, N], weight: Tensor[N]) -> Tensor[M, N]",
+  "dim_names": [
+    "M",
+    "N"
+  ],
+  "dtypes": [
+    "bfloat16"
+  ],
+  "tolerance": {
+    "bfloat16": {
+      "atol": 0.02,
+      "rtol": 0.02
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "N": 1024
+    },
+    {
+      "M": 4096,
+      "N": 4096
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "row",
+    "norm",
+    "fusion"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 2 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

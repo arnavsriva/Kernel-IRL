@@ -1,0 +1,37 @@
+{
+  "id": "l2_cross_entropy",
+  "level": 2,
+  "name": "Per-row cross-entropy",
+  "description": "Per-row cross-entropy loss (no reduction): out[m] = logsumexp(logits[m, :]) - logits[m, target[m]]. target is int64 in [0, V). Output shape [M], float32.",
+  "signature": "run(logits: Tensor[M, V], target: Tensor[M] (int64)) -> Tensor[M]",
+  "dim_names": [
+    "M",
+    "V"
+  ],
+  "dtypes": [
+    "float32"
+  ],
+  "tolerance": {
+    "float32": {
+      "atol": 0.0001,
+      "rtol": 0.0001
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "V": 4096
+    },
+    {
+      "M": 4096,
+      "V": 32000
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "row",
+    "reduction",
+    "gather"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 2 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

@@ -1,0 +1,36 @@
+{
+  "id": "l1_relu",
+  "level": 1,
+  "name": "ReLU",
+  "description": "Compute out = max(x, 0) elementwise.",
+  "signature": "run(x: Tensor[M, N]) -> Tensor[M, N]",
+  "dim_names": [
+    "M",
+    "N"
+  ],
+  "dtypes": [
+    "float32"
+  ],
+  "tolerance": {
+    "float32": {
+      "atol": 1e-05,
+      "rtol": 1e-05
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "N": 1024
+    },
+    {
+      "M": 4096,
+      "N": 4096
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "elementwise",
+    "activation"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 1 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

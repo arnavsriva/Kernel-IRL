@@ -1,0 +1,35 @@
+{
+  "id": "l1_row_sum",
+  "level": 1,
+  "name": "Row sum",
+  "description": "Sum each row: out[m] = sum_n x[m, n]. Output has shape [M].",
+  "signature": "run(x: Tensor[M, N]) -> Tensor[M]",
+  "dim_names": [
+    "M",
+    "N"
+  ],
+  "dtypes": [
+    "float32"
+  ],
+  "tolerance": {
+    "float32": {
+      "atol": 0.001,
+      "rtol": 0.0001
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "N": 1024
+    },
+    {
+      "M": 4096,
+      "N": 4096
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "reduction"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 1 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

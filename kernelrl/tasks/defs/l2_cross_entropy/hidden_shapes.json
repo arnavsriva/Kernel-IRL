@@ -1,0 +1,44 @@
+{
+  "shapes": [
+    {
+      "dims": {
+        "M": 1,
+        "V": 1
+      },
+      "bench": false,
+      "note": "tiny"
+    },
+    {
+      "dims": {
+        "M": 3,
+        "V": 5
+      },
+      "bench": false,
+      "note": "tiny, odd"
+    },
+    {
+      "dims": {
+        "M": 7,
+        "V": 4097
+      },
+      "bench": false,
+      "note": "odd vocab"
+    },
+    {
+      "dims": {
+        "M": 1000,
+        "V": 50257
+      },
+      "bench": true,
+      "note": "GPT-2 vocab"
+    },
+    {
+      "dims": {
+        "M": 2048,
+        "V": 128256
+      },
+      "bench": true,
+      "note": "Llama-3 vocab"
+    }
+  ]
+}

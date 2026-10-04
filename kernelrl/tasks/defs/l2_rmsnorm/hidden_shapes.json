@@ -1,0 +1,60 @@
+{
+  "shapes": [
+    {
+      "dims": {
+        "M": 1,
+        "N": 1
+      },
+      "bench": false,
+      "note": "tiny"
+    },
+    {
+      "dims": {
+        "M": 3,
+        "N": 5
+      },
+      "bench": false,
+      "note": "tiny, odd"
+    },
+    {
+      "dims": {
+        "M": 1023,
+        "N": 1000
+      },
+      "bench": true,
+      "note": "non-power-of-2 rows and cols"
+    },
+    {
+      "dims": {
+        "M": 7,
+        "N": 4097
+      },
+      "bench": false,
+      "note": "few long odd rows"
+    },
+    {
+      "dims": {
+        "M": 2,
+        "N": 65537
+      },
+      "bench": false,
+      "note": "very long rows, 2^16+1"
+    },
+    {
+      "dims": {
+        "M": 16384,
+        "N": 1024
+      },
+      "bench": true,
+      "note": "many rows"
+    },
+    {
+      "dims": {
+        "M": 2048,
+        "N": 8192
+      },
+      "bench": true,
+      "note": "large"
+    }
+  ]
+}

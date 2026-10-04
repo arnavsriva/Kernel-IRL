@@ -1,0 +1,58 @@
+{
+  "shapes": [
+    {
+      "dims": {
+        "M": 1,
+        "N": 1,
+        "K": 1
+      },
+      "bench": false,
+      "note": "tiny"
+    },
+    {
+      "dims": {
+        "M": 127,
+        "N": 257,
+        "K": 511
+      },
+      "bench": false,
+      "note": "odd, non-power-of-2"
+    },
+    {
+      "dims": {
+        "M": 1,
+        "N": 4096,
+        "K": 4096
+      },
+      "bench": false,
+      "note": "GEMV-like"
+    },
+    {
+      "dims": {
+        "M": 1000,
+        "N": 1000,
+        "K": 1000
+      },
+      "bench": true,
+      "note": "non-power-of-2"
+    },
+    {
+      "dims": {
+        "M": 64,
+        "N": 8192,
+        "K": 128
+      },
+      "bench": false,
+      "note": "skinny"
+    },
+    {
+      "dims": {
+        "M": 4096,
+        "N": 4096,
+        "K": 4096
+      },
+      "bench": true,
+      "note": "large"
+    }
+  ]
+}

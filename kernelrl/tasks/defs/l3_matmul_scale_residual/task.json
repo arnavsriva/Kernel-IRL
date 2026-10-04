@@ -1,0 +1,39 @@
+{
+  "id": "l3_matmul_scale_residual",
+  "level": 3,
+  "name": "Matmul + scale + residual epilogue",
+  "description": "Compute out = 0.5 * (a @ b) + c. float16 inputs/output, accumulate in float32. Fuse the epilogue into the matmul.",
+  "signature": "run(a: Tensor[M, K], b: Tensor[K, N], c: Tensor[M, N]) -> Tensor[M, N]",
+  "dim_names": [
+    "M",
+    "N",
+    "K"
+  ],
+  "dtypes": [
+    "float16"
+  ],
+  "tolerance": {
+    "float16": {
+      "atol": 0.01,
+      "rtol": 0.01
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 512,
+      "N": 512,
+      "K": 512
+    },
+    {
+      "M": 2048,
+      "N": 2048,
+      "K": 2048
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "matmul",
+    "fusion"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 3 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

@@ -1,0 +1,36 @@
+{
+  "id": "l1_fused_add_relu",
+  "level": 1,
+  "name": "Fused add + ReLU",
+  "description": "Compute out = relu(x + y) in a single pass. float16.",
+  "signature": "run(x: Tensor[M, N], y: Tensor[M, N]) -> Tensor[M, N]",
+  "dim_names": [
+    "M",
+    "N"
+  ],
+  "dtypes": [
+    "float16"
+  ],
+  "tolerance": {
+    "float16": {
+      "atol": 0.001,
+      "rtol": 0.005
+    }
+  },
+  "public_shapes": [
+    {
+      "M": 1024,
+      "N": 1024
+    },
+    {
+      "M": 4096,
+      "N": 4096
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "elementwise",
+    "fusion"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 1 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

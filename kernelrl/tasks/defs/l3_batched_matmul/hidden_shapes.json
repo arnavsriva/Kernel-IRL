@@ -1,0 +1,44 @@
+{
+  "shapes": [
+    {
+      "dims": {
+        "B": 1,
+        "M": 1,
+        "N": 1,
+        "K": 1
+      },
+      "bench": false,
+      "note": "tiny"
+    },
+    {
+      "dims": {
+        "B": 3,
+        "M": 127,
+        "N": 65,
+        "K": 33
+      },
+      "bench": false,
+      "note": "odd"
+    },
+    {
+      "dims": {
+        "B": 16,
+        "M": 1000,
+        "N": 1000,
+        "K": 64
+      },
+      "bench": true,
+      "note": "non-power-of-2"
+    },
+    {
+      "dims": {
+        "B": 64,
+        "M": 512,
+        "N": 512,
+        "K": 512
+      },
+      "bench": true,
+      "note": "large"
+    }
+  ]
+}

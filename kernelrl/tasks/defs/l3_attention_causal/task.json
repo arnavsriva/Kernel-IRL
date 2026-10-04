@@ -1,0 +1,43 @@
+{
+  "id": "l3_attention_causal",
+  "level": 3,
+  "name": "Attention (causal)",
+  "description": "Causal scaled dot-product attention: query position i attends to key positions j <= i. out = softmax(mask(q @ k^T / sqrt(D)), dim=-1) @ v. q, k, v and out are float16 [B, H, S, D]; D is one of 32, 64, 128. Accumulate in float32.",
+  "signature": "run(q: Tensor[B, H, S, D], k: Tensor[B, H, S, D], v: Tensor[B, H, S, D]) -> Tensor[B, H, S, D]",
+  "dim_names": [
+    "B",
+    "H",
+    "S",
+    "D"
+  ],
+  "dtypes": [
+    "float16"
+  ],
+  "tolerance": {
+    "float16": {
+      "atol": 0.01,
+      "rtol": 0.01
+    }
+  },
+  "public_shapes": [
+    {
+      "B": 2,
+      "H": 8,
+      "S": 512,
+      "D": 64
+    },
+    {
+      "B": 1,
+      "H": 16,
+      "S": 2048,
+      "D": 64
+    }
+  ],
+  "allowed_imports": null,
+  "tags": [
+    "attention",
+    "fusion",
+    "causal"
+  ],
+  "provenance": "Original KernelRL task (written from scratch). Task category inspired by KernelBench level 3 (github.com/ScalingIntelligence/KernelBench, MIT license); no KernelBench code copied."
+}

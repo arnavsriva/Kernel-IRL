@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kernelrl"
+version = "0.0.1"
+description = "Multi-turn RL for writing optimized Triton kernels"
+requires-python = ">=3.12,<3.13"
+# Core deps are CPU-safe so static checks, prompts, extraction, and reward run anywhere.
+dependencies = [
+    "PyYAML==6.0.2",
+    "numpy==1.26.4",
+]
+
+[project.optional-dependencies]
+# Local CPU development (macOS or Linux without a GPU). torch is CPU-only here.
+cpu = ["torch==2.11.0"]
+# GPU box. Versions match slime's image (slimerl/sglang:v0.5.15.post1-cu129):
+# torch 2.11.0+cu129 pins triton 3.6.0; sglang 0.5.15.post1 pins openai 2.6.1.
+gpu = [
+    "torch==2.11.0",
+    "triton==3.6.0",
+]
+serving = [
+    "sglang==0.5.15.post1",
+    "openai==2.6.1",
+    "aiohttp==3.12.15",
+]
+dev = [
+    "pytest==8.4.2",
+]
+
+[tool.setuptools.packages.find]
+include = ["kernelrl*"]
+
+[tool.setuptools.package-data]
+"kernelrl" = ["**/*.json", "**/*.yaml", "**/*.sh", "tasks/defs/**/*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "gpu: requires an NVIDIA GPU with triton installed (auto-skipped otherwise)",
+    "slow: slow tests",
+]

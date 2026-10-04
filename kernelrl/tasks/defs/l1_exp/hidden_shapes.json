@@ -1,0 +1,44 @@
+{
+  "shapes": [
+    {
+      "dims": {
+        "M": 1,
+        "N": 1
+      },
+      "bench": false,
+      "note": "tiny"
+    },
+    {
+      "dims": {
+        "M": 3,
+        "N": 5
+      },
+      "bench": false,
+      "note": "tiny, odd"
+    },
+    {
+      "dims": {
+        "M": 1000,
+        "N": 1003
+      },
+      "bench": true,
+      "note": "non-power-of-2"
+    },
+    {
+      "dims": {
+        "M": 1,
+        "N": 65537
+      },
+      "bench": false,
+      "note": "single long row, 2^16+1"
+    },
+    {
+      "dims": {
+        "M": 8192,
+        "N": 8192
+      },
+      "bench": true,
+      "note": "large"
+    }
+  ]
+}
