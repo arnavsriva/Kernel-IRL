@@ -1,0 +1,52 @@
+# Sandbox / verifier configuration. Bump `methodology_version` whenever a change
+# affects timing numbers, so cached baselines are invalidated.
+methodology_version: 1
+
+timeouts_s:
+  compile: 180      # import + first call on every shape (Triton JIT + autotune)
+  check: 180        # correctness + anti-hacking checks
+  bench: 240        # paired timing vs eager reference
+  baseline: 900     # eager + torch.compile reference timings for one task
+  probe: 60         # GPU health probe after a timeout/crash
+
+limits:
+  host_rss_gb: 24           # parent kills the child above this resident set size
+  max_file_bytes: 268435456 # RLIMIT_FSIZE in the child (stdout flood, file writes)
+  max_source_bytes: 65536
+  watchdog_interval_s: 0.05
+
+correctness:
+  num_seeds: 2              # fresh random seeds per evaluation (recorded in the result)
+  fixed_seeds: null         # list of ints to make an evaluation reproducible
+  poison_allocator: true    # fill freed memory with NaN bytes before each candidate call
+
+hack_checks:
+  distinct_inputs: true          # constant / cached outputs
+  mutation_after_call: true      # lazy views of inputs
+  same_address_reuse: true       # caches keyed on data_ptr
+  call_order_permutation: true   # state carried between calls
+  launch_check: true             # a Triton kernel must do the work
+  min_triton_time_fraction: 0.8  # share of GPU kernel time inside the candidate's Triton kernels
+  require_profiler: true         # never silently skip the launch check
+  api_tamper_sentinel: true      # torch/time/reference functions must not be replaced
+
+benchmark:
+  warmup: 25
+  iters: 100
+  l2_flush_bytes: 268435456      # 256 MiB, > 2x L2 on H100/A100
+  input_variants: 2              # input contents rotate between timed iterations
+  verify_iters: 3                # randomly chosen timed iterations checked for correctness
+  bench_seed: 1234
+  inproc_reference_ratio_limit: 2.0  # in-process eager vs clean eager; outside [1/x, x] => tampering
+  wall_over_event_limit: 3.0     # wall-clock vs CUDA-event time; catches unsynchronized work
+  wall_over_event_min_ms: 0.1
+  wall_iters: 20
+  compile_mode: default          # torch.compile mode for the compiled baseline
+
+feedback:
+  max_error_chars: 1500
+  include_profiler: false        # Phase 5 ablation toggle
+  max_shapes_listed: 6
+
+probe_after_failure: true
+child_env_passthrough: [PATH, LD_LIBRARY_PATH, CUDA_HOME, HOME, LANG, LC_ALL, TRITON_PTXAS_PATH, NVIDIA_VISIBLE_DEVICES]

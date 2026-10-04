@@ -1,0 +1,25 @@
+# Reward = f(sandbox EvalResult). All coefficients live here, not in code.
+version: 1
+
+# Reward for each non-correct status.
+status_rewards:
+  static_reject: 0.0
+  compile_error: 0.0
+  timeout: 0.0
+  crash: 0.0
+  hack_detected: 0.0      # may go negative later (Phase 5 study)
+  incorrect: 0.0          # set e.g. 0.05 to credit "compiles and runs but wrong"
+
+correct:
+  # reward = base + weight * normalized,  normalized = (clip(log_b(speedup), lo, hi) - lo) / (hi - lo)
+  base: 0.3
+  speedup_weight: 0.7
+  speedup_baseline: eager # eager | compile
+  log_base: 2.0
+  log_clip_min: 0.0       # speedup <= 1x gets the base reward only
+  log_clip_max: 2.0       # speedup >= 4x saturates
+  no_timing_reward: base  # if timing is unavailable for a correct kernel: base | zero
+
+# Infrastructure errors (verifier/GPU problems, not the policy's fault). null => reward is None
+# so the trainer can drop or retry the sample instead of learning from noise.
+infra_error_reward: null
