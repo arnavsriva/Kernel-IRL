@@ -35,7 +35,7 @@ benchmark:
   iters: 100
   l2_flush_bytes: 268435456      # 256 MiB, > 2x L2 on H100/A100
   input_variants: 2              # input contents rotate between timed iterations
-  verify_iters: 3                # randomly chosen timed iterations checked for correctness
+  verify_iters: 4                # random timed iterations (covering every variant) + the last one are verified
   bench_seed: 1234
   inproc_reference_ratio_limit: 2.0  # in-process eager vs clean eager; outside [1/x, x] => tampering
   wall_over_event_limit: 3.0     # wall-clock vs CUDA-event time; catches unsynchronized work

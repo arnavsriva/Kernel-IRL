@@ -1,6 +1,7 @@
 """Helpers used only inside sandbox child processes (imports torch)."""
 from __future__ import annotations
 
+import errno
 import json
 import time
 import traceback
@@ -31,6 +32,8 @@ def classify_exception(e: BaseException) -> tuple[str, str]:
     name, mod, msg = type(e).__name__, type(e).__module__ or "", str(e)
     if isinstance(e, torch.OutOfMemoryError):
         return "crash", "cuda_oom"
+    if isinstance(e, OSError) and e.errno == errno.EFBIG:  # RLIMIT_FSIZE (CPython ignores SIGXFSZ)
+        return "crash", "file_size_limit"
     if mod.startswith("triton"):
         if name == "OutOfResources":
             return "compile_error", "triton_out_of_resources"

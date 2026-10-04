@@ -1,7 +1,8 @@
 """Timing (runs in fresh children).
 
 Methodology (one timed iteration):
-    copy input variant (i % P) into the working buffers   # untimed; defeats caching keyed on pointers
+    load input variant (i % P) into the working buffers, rolled by an i-dependent shift,
+    so every call (warmup and timed) sees unique contents  # untimed; defeats memoization
     flush L2 by writing a 256 MiB buffer                   # untimed, but enqueued before `start`
     start.record(); out = fn(); end.record()
 Candidate and eager reference are interleaved ABAB/BABA in the same process to cancel clock
@@ -39,11 +40,15 @@ class Timed:
         self.variants = variants
         self.work = clone_inputs(variants[0])
 
-    def prepare(self, i: int) -> None:
-        src = self.variants[i % len(self.variants)]
+    def prepare(self, idx: int) -> None:
+        """Load variant (idx % P), rolled by an idx-dependent shift: exact for every dtype,
+        same value distribution, and different contents for every call index."""
+        src = self.variants[idx % len(self.variants)]
         for dst, s in zip(self.work, src):
             if isinstance(dst, torch.Tensor):
-                dst.copy_(s)
+                n = s.numel()
+                shift = (idx * 7919 + 1) % n if n > 1 else 0
+                dst.view(-1).copy_(s.reshape(-1).roll(shift))
 
     def __call__(self):
         return self.fn(*self.work)
@@ -62,20 +67,24 @@ def timed_loop(fns: list[Timed], *, warmup: int, iters: int, flush: torch.Tensor
     starts = [[ev() for _ in range(iters)] for _ in fns]
     ends = [[ev() for _ in range(iters)] for _ in fns]
     kept: dict[int, dict[int, torch.Tensor]] = {k: {} for k in range(len(fns))}
+    kept_inputs: dict[int, dict[int, tuple]] = {k: {} for k in range(len(fns))}
     for i in range(iters):
         order = range(len(fns)) if i % 2 == 0 else reversed(range(len(fns)))
         for k in order:
             f = fns[k]
-            f.prepare(i)
+            f.prepare(warmup + i)
+            keep_this = i in keep.get(k, ())
+            if keep_this:
+                kept_inputs[k][i] = clone_inputs(f.work)
             flush.zero_()
             starts[k][i].record()
             out = f()
             ends[k][i].record()
-            if i in keep.get(k, ()):
+            if keep_this:
                 kept[k][i] = out.clone() if isinstance(out, torch.Tensor) else out
     torch.cuda.synchronize()
     times = [[s.elapsed_time(e) for s, e in zip(starts[k], ends[k])] for k in range(len(fns))]
-    return times, kept
+    return times, {k: {i: (kept_inputs[k][i], kept[k][i]) for i in kept[k]} for k in kept}
 
 
 def wall_clock_ms(f: Timed, iters: int) -> list[float]:
@@ -88,6 +97,16 @@ def wall_clock_ms(f: Timed, iters: int) -> list[float]:
         torch.cuda.synchronize()
         out.append((time.perf_counter() - t0) * 1e3)
     return out
+
+
+def _verify_iters(rng: random.Random, iters: int, n_verify: int, n_variants: int) -> set[int]:
+    """Random timed iterations to verify, covering every input variant, plus the last one."""
+    chosen = {iters - 1}
+    per = max(1, -(-n_verify // n_variants))
+    for v in range(n_variants):
+        pool = [i for i in range(iters) if i % n_variants == v]
+        chosen.update(rng.sample(pool, min(per, len(pool))))
+    return chosen
 
 
 def _variants(ref_mod, spec, dtype_name, base_seed, n):
@@ -104,11 +123,10 @@ def run_bench_stage(job, run_fn, ref_mod, progress, sentinel, candidate_path) ->
     timings, findings = [], []
     for spec in [s for s in job["shapes"] if s.get("bench")]:
         variants = _variants(ref_mod, spec, dt, bc["bench_seed"], bc["input_variants"])
-        his = [reference_hi(ref_mod.reference, v) for v in variants]
         shape, odtype = expected_output_meta(ref_mod.reference, variants[0])
         cand = Timed(run_fn, variants)
         eager = Timed(ref_mod.reference, variants)
-        keep_iters = set(rng.sample(range(bc["iters"]), min(bc["verify_iters"], bc["iters"])))
+        keep_iters = _verify_iters(rng, bc["iters"], bc["verify_iters"], len(variants))
         try:
             with torch.no_grad():
                 (tc, te), kept = timed_loop([cand, eager], warmup=bc["warmup"], iters=bc["iters"], flush=flush,
@@ -117,8 +135,8 @@ def run_bench_stage(job, run_fn, ref_mod, progress, sentinel, candidate_path) ->
         except Exception as e:  # noqa: BLE001
             status, reason = classify_exception(e)
             raise StageFailure(status, reason, format_exception(e, candidate_path), spec) from None
-        for i, out in kept[0].items():
-            c = compare(out, his[i % len(variants)], shape, odtype, dev, **job["tolerance"][dt])
+        for i, (inp, out) in sorted(kept[0].items()):
+            c = compare(out, reference_hi(ref_mod.reference, inp), shape, odtype, dev, **job["tolerance"][dt])
             if not c["passed"]:
                 findings.append({"check": "bench_output_incorrect", "hidden": bool(spec.get("hidden")),
                                  "shape": spec["dims"],
@@ -133,7 +151,7 @@ def run_bench_stage(job, run_fn, ref_mod, progress, sentinel, candidate_path) ->
         timings.append({"shape": spec["dims"], "dtype": dt, "hidden": bool(spec.get("hidden")),
                         "candidate": cs, "eager_inproc": es, "wall_over_event": ratio})
         progress.log(event="bench", shape=spec["dims"], cand_ms=cs["median_ms"], eager_ms=es["median_ms"])
-        del variants, his, cand, eager, kept
+        del variants, cand, eager, kept
     changed = sentinel.changed() if cfg["hack_checks"]["api_tamper_sentinel"] else []
     if changed:
         findings.append({"check": "api_tamper", "message": f"replaced: {', '.join(changed[:8])}",

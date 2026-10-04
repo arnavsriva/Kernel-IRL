@@ -110,9 +110,8 @@ class _Checker(ast.NodeVisitor):
             return True
         return path in ("torch", "triton")  # bare module name used as attribute base only
 
-    def _is_kernel_decorator(self, dec: ast.AST) -> bool:
-        target = dec.func if isinstance(dec, ast.Call) else dec
-        return self.path_of(target) in KERNEL_DECORATORS
+    def _decorator_path(self, dec: ast.AST) -> str | None:
+        return self.path_of(dec.func if isinstance(dec, ast.Call) else dec)
 
     # ---------- imports ----------
     def visit_Import(self, node: ast.Import) -> None:
@@ -216,11 +215,13 @@ class _Checker(ast.NodeVisitor):
         self.flag(node, "global_statement", "'nonlocal' is not allowed")
 
     def _visit_func(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
-        is_kernel = any(self._is_kernel_decorator(d) for d in node.decorator_list)
+        decs = {self._decorator_path(d) for d in node.decorator_list}
+        is_kernel = bool(decs & KERNEL_DECORATORS)  # device-code context
         for d in node.decorator_list:
             self.visit(d)
-        if is_kernel:
+        if "triton.jit" in decs:
             self.kernel_count += 1
+        if is_kernel:
             self.in_kernel += 1
         for child in [node.args, *node.body, *([node.returns] if node.returns else [])]:
             self.visit(child)

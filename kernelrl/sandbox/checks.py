@@ -82,6 +82,14 @@ def check_one(ctx: Ctx, spec, dtype_name, seed, *, mutate_after: bool) -> dict:
             "mismatch_frac": c["mismatch_frac"], "error": c["error"]}
 
 
+def _looks_computed(t) -> bool:
+    """True for outputs that look like real results rather than bug artifacts: finite (not
+    poisoned / never written) and non-uniform (not all-zero). Bit-identical outputs of this kind
+    for inputs whose references differ are a replayed (cached) result, not an ordinary bug."""
+    return (isinstance(t, torch.Tensor) and t.is_floating_point() and t.numel() > 1
+            and bool(torch.isfinite(t).all()) and bool(t.max() != t.min()))
+
+
 def distinct_inputs_check(ctx: Ctx, spec, dtype_name, base_seed) -> None:
     sa, sb = _derived_seed(base_seed, 1), _derived_seed(base_seed, 2)
     xa, xb = ctx.inputs(spec, dtype_name, sa), ctx.inputs(spec, dtype_name, sb)
@@ -99,7 +107,8 @@ def distinct_inputs_check(ctx: Ctx, spec, dtype_name, base_seed) -> None:
         return  # degenerate shape: different inputs, same output
     dev = torch.device(DEVICE, torch.cuda.current_device())
     a_ok = compare(ca_snap, hia, shape, odtype, dev, **ctx.tol(dtype_name))["passed"]
-    if a_ok and bitwise_equal(cb, ca_snap):
+    replayed = bitwise_equal(cb, ca_snap) and _looks_computed(ca_snap)
+    if (a_ok and bitwise_equal(cb, ca_snap)) or replayed:
         ctx.finding("cached_output", "identical output for two different inputs (cached or hardcoded result)", spec)
     elif a_ok and not bitwise_equal(ca, ca_snap):
         ctx.finding("output_buffer_reused", "a previously returned output was overwritten by a later call", spec)
@@ -129,7 +138,7 @@ def same_address_check(ctx: Ctx, spec, dtype_name, base_seed) -> dict | None:
     r2 = compare(c2, hi2, shape, odtype, dev, **tol)
     if r2["passed"]:
         return None
-    if c1_ok and not bitwise_equal(hi1, hi2) and bitwise_equal(c2, c1s):
+    if (c1_ok or _looks_computed(c1s)) and not bitwise_equal(hi1, hi2) and bitwise_equal(c2, c1s):
         ctx.finding("pointer_keyed_cache", "stale result returned when input buffers were reused with new contents", spec)
         return None
     return {"shape": spec["dims"], "dtype": dtype_name, "seed": sd, "hidden": bool(spec.get("hidden")),
