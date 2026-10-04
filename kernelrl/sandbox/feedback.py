@@ -21,7 +21,10 @@ _RULES_HINT = ("Rules: implement the computation in @triton.jit kernels; host co
 
 
 def hidden_only_values(task: Task) -> set[int]:
+    """Dimension values that occur only in hidden shapes. Values stated in the public task
+    contract (e.g. "D is one of 32, 64, 128") are public by definition."""
     pub = {v for s in task.public_shapes for v in s.values()}
+    pub |= {int(m) for m in _INT.findall(task.description)}
     hid = {v for s in task.hidden_shapes() for v in s.dims.values()}
     return {v for v in hid - pub if v >= REDACT_MIN}
 
