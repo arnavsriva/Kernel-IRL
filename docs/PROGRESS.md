@@ -72,6 +72,20 @@ Report: `docs/results/gpu_probe.json`. Image `slimerl/sglang:v0.5.15.post1-cu129
 - Use `modal run --detach` for GPU steps. Without it, a dropped connection from the Mac stopped the
   app twice during the image build.
 
+### Adversarial verdict suite on Modal L40S (2026-10-09): 215/215 PASSED
+Log: `docs/results/verdicts_pytest.log`. Every good, buggy, hack, and hostile fixture gets its
+expected verdict. `test_no_hack_scores_correct` reruns all runtime hacks with benchmarking
+enabled, and none scores correct. A good kernel still evaluates correctly right after hostile
+kernels on the same GPU.
+- The first run passed 213 of 214 tests. `buggy/matmul_drops_k_tail` was labelled
+  `hack_detected/pointer_keyed_cache` instead of `incorrect`. On the hidden shape M=N=K=1 that bug
+  always outputs a single 0, and for one derived seed 0 was within atol of the reference.
+  Diagnosis is in `docs/results/diagnose_fixture.log`.
+- Fix: the `cached_output` and `pointer_keyed_cache` findings now require a computed-looking output
+  (more than one element, finite, non-constant). This is flagged to the user as a verifier change.
+  The correctness gate and reward are unchanged; only the hack label for trivial outputs is
+  affected.
+
 ### Open issues and decisions
 - Clock locking for benchmarks (`nvidia-smi -lgc`) needs root, so ask before changing system state.
 - The Docker image is over 20 GB, so the setup script requires an explicit flag.

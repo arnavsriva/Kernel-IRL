@@ -58,9 +58,9 @@ static AST check ──reject──▶ static_reject / compile_error(syntax)
 | no_triton_kernel / missing_entrypoint / entrypoint_signature | static | no `@triton.jit`, no `run`, wrong arity |
 | output_aliases_input | runtime | returning an input or a view of one (in-place "kernels") |
 | lazy_output | runtime | outputs that change when inputs are modified after the call |
-| cached_output | runtime | bit-identical, finite, non-uniform outputs for two inputs whose references differ (memoized or hardcoded results) |
+| cached_output | runtime | bit-identical outputs for two inputs whose references differ (memoized or hardcoded results). Requires a computed-looking output (more than one element, finite, non-constant); trivial outputs fall through to `incorrect` |
 | output_buffer_reused | runtime | a later call overwrites a previously returned output |
-| pointer_keyed_cache | runtime | stale result when the same input buffers are refilled with new contents |
+| pointer_keyed_cache | runtime | stale result when the same input buffers are refilled with new contents (same evidence rule as cached_output) |
 | state_dependent | runtime | same input correct earlier, wrong after calls are reordered |
 | no_triton_launch | runtime | no Triton launch observed via `triton.knobs.runtime.launch_enter_hook` (host arithmetic, skipped work) |
 | low_triton_time_fraction | runtime | under 80% of profiled GPU kernel time in the candidate's Triton kernels (token kernel plus PyTorch doing the work) |
@@ -136,6 +136,8 @@ shape", and hidden-only dimension values of 10 or more are redacted from error t
 9. **GPU recovery after device-side hangs** depends on the driver tearing down the killed context.
    The health probe detects a wedged GPU, but the worker must then be restarted (Phase 1 actor
    restart).
-10. **Unverified on hardware.** The GPU stages were written against the triton 3.6.0 and torch
-    2.11.0 sources, including the launch-hook API and `LazyDict` metadata. They had not been run on
-    a GPU when this was written; see PROGRESS.md.
+10. **Degenerate shapes give weaker hack evidence.** On 1-element or constant outputs, caching
+    cannot be told apart from a bug, so those cases are reported as `incorrect` rather than
+    `hack_detected`. Larger shapes in the same evaluation still catch real caches.
+11. **Hardware coverage.** Verified on an NVIDIA L40S (Modal, gVisor) with triton 3.6.0 and torch
+    2.11.0+cu129. H100 runs are pending; see PROGRESS.md.
