@@ -33,7 +33,7 @@ for step in $STEPS; do
   case "$step" in
     probe) $PY scripts/gpu_probe.py --out docs/results/gpu_probe.json ;;
     validate) $PY -m kernelrl.tasks.validate --device cuda ;;
-    verdicts) $PY -m pytest -v -rs --durations=15 tests/ 2>&1 | tee docs/results/verdicts_pytest.log; exit "${PIPESTATUS[0]}" ;;   # includes tests/gpu
+    verdicts) $PY -m pytest -v -rs --durations=15 tests/ 2>&1 | tee docs/results/verdicts_pytest.log ;;  # pipefail propagates pytest failures   # includes tests/gpu
     eval)
       start_server on 30000
       $PY -m kernelrl.eval.run_eval --run-id "$RUN_ID" --server-url http://127.0.0.1:30000/v1 ${EVAL_ARGS:-}
