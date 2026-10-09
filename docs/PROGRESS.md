@@ -53,6 +53,25 @@ Modal runs containers under gVisor. The sandbox's launch check needs CUPTI kerne
 the RSS watchdog, `RLIMIT_FSIZE`, and 10 fixtures end to end. If CUPTI tracing is unavailable, the
 launch check needs a fallback before any eval; it must not be skipped.
 
+### GPU probe on Modal L40S (2026-10-09): PASSED
+Report: `docs/results/gpu_probe.json`. Image `slimerl/sglang:v0.5.15.post1-cu129`, driver
+610.57.04 (CUDA 13.3), torch 2.11.0+cu129, triton 3.6.0, sglang 0.5.15.post1.
+- Under Modal's sandbox, CUPTI kernel tracing works through `torch.profiler`. Triton
+  launch-hook names match the CUPTI kernel names exactly, and the hook reports the current stream.
+- Isolation primitives all work: process-group timeout kill, SIGSEGV reporting, `RLIMIT_FSIZE`,
+  and the RSS watchdog.
+- All 10 fixtures got the expected verdict. The GPU stayed healthy after illegal memory access, a
+  device-side infinite loop, and a segfault.
+- The first attempt found an API-sentinel false positive. `torch._dynamo` replaces
+  `torch.manual_seed` when it is first imported, and harness code triggered that after the
+  snapshot. The fix preloads trusted torch modules before the snapshot, which does not weaken the
+  sentinel. The same fix closed a gap where runtime patches of `torch.Tensor` methods inherited
+  from `TensorBase` were missed.
+- Note: the image ships numpy 2.4.4, while the pyproject pins 1.26.4 (slime's top layer).
+  KernelRL does not depend on numpy at runtime. Revisit in Phase 2 with the full slime image.
+- Use `modal run --detach` for GPU steps. Without it, a dropped connection from the Mac stopped the
+  app twice during the image build.
+
 ### Open issues and decisions
 - Clock locking for benchmarks (`nvidia-smi -lgc`) needs root, so ask before changing system state.
 - The Docker image is over 20 GB, so the setup script requires an explicit flag.

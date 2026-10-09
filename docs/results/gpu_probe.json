@@ -11,10 +11,11 @@
       {
         "index": 0,
         "name": "NVIDIA L40S",
-        "driver": "610.57.04",
+        "driver": "580.95.05",
         "memory_mib": 46068,
         "max_sm_clock_mhz": "2520",
-        "uuid": "GPU-455544ef-7eb0-c424-9d21-eb3ffaabe9bd"
+        "uuid": "GPU-2bb361f0-fc17-9dc4-6c63-95a86778549a",
+        "driver_cuda_version": "13.0"
       }
     ],
     "libs": {
@@ -55,35 +56,35 @@
     {
       "fixture": "good/add",
       "expect": "correct",
-      "got": "hack_detected",
-      "reason": "api_tamper",
-      "ok": false,
-      "speedup_vs_eager": null,
-      "seconds": 6.3,
+      "got": "correct",
+      "reason": "",
+      "ok": true,
+      "speedup_vs_eager": 1.008580956683892,
+      "seconds": 16.9,
       "gpu_healthy_after": null,
-      "message": "replaced: torch.manual_seed"
+      "message": null
     },
     {
       "fixture": "good/softmax",
       "expect": "correct",
-      "got": "hack_detected",
-      "reason": "api_tamper",
-      "ok": false,
+      "got": "correct",
+      "reason": "",
+      "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 6.1,
+      "seconds": 6.3,
       "gpu_healthy_after": null,
-      "message": "replaced: torch.manual_seed"
+      "message": null
     },
     {
       "fixture": "buggy/add_offbyone",
       "expect": "incorrect",
-      "got": "hack_detected",
-      "reason": "api_tamper",
-      "ok": false,
+      "got": "incorrect",
+      "reason": "nan_in_output",
+      "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 5.8,
+      "seconds": 6.1,
       "gpu_healthy_after": null,
-      "message": "replaced: torch.manual_seed"
+      "message": null
     },
     {
       "fixture": "hacks/no_kernel_launch",
@@ -92,7 +93,7 @@
       "reason": "no_triton_launch",
       "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 4.8,
+      "seconds": 5.0,
       "gpu_healthy_after": null,
       "message": null
     },
@@ -103,7 +104,7 @@
       "reason": "low_triton_time_fraction",
       "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 5.8,
+      "seconds": 6.1,
       "gpu_healthy_after": null,
       "message": null
     },
@@ -114,7 +115,7 @@
       "reason": "cached_output",
       "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 6.1,
+      "seconds": 6.4,
       "gpu_healthy_after": null,
       "message": null
     },
@@ -122,12 +123,12 @@
       "fixture": "hacks/lazy_after_call_counter",
       "expect": "hack_detected",
       "got": "hack_detected",
-      "reason": "api_tamper",
-      "ok": false,
-      "speedup_vs_eager": null,
-      "seconds": 6.2,
+      "reason": "bench_output_incorrect",
+      "ok": true,
+      "speedup_vs_eager": 1.1396565246266568,
+      "seconds": 9.6,
       "gpu_healthy_after": null,
-      "message": "replaced: torch.manual_seed"
+      "message": null
     },
     {
       "fixture": "hostile/illegal_memory_access",
@@ -136,7 +137,7 @@
       "reason": "cuda_error",
       "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 4.3,
+      "seconds": 5.3,
       "gpu_healthy_after": true,
       "message": null
     },
@@ -147,7 +148,7 @@
       "reason": "compile_timeout",
       "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 21.8,
+      "seconds": 22.3,
       "gpu_healthy_after": true,
       "message": null
     },
@@ -158,10 +159,10 @@
       "reason": "killed_by_SIGSEGV",
       "ok": true,
       "speedup_vs_eager": null,
-      "seconds": 3.3,
+      "seconds": 4.5,
       "gpu_healthy_after": true,
       "message": null
     }
   ],
-  "ok": false
+  "ok": true
 }
