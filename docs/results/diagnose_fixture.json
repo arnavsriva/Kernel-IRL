@@ -1,0 +1,825 @@
+{
+  "buggy/matmul_drops_k_tail": {
+    "task_id": "l3_matmul",
+    "status": "hack_detected",
+    "reason": "pointer_keyed_cache",
+    "message": "stale result returned when input buffers were reused with new contents",
+    "stage": "check",
+    "findings": [
+      {
+        "check": "pointer_keyed_cache",
+        "message": "stale result returned when input buffers were reused with new contents",
+        "shape": {
+          "M": 1,
+          "N": 1,
+          "K": 1
+        },
+        "hidden": true
+      }
+    ],
+    "shape_results": [
+      {
+        "shape": {
+          "M": 64,
+          "N": 8192,
+          "K": 128
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019502639770507812,
+        "max_rel_err": 0.30434781312942505,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 127,
+          "N": 257,
+          "K": 511
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 1.1421329975128174,
+        "max_rel_err": 16451.421875,
+        "mismatch_frac": 0.9415117502212524,
+        "error": "value_mismatch: 94.15% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=1.142e+00; first bad flat index 0: got 0.637207 expected 0.815169"
+      },
+      {
+        "shape": {
+          "M": 512,
+          "N": 512,
+          "K": 512
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.0017004013061523438,
+        "max_rel_err": 2.0,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 4096,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019845962524414062,
+        "max_rel_err": 18.86046600341797,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 2048,
+          "N": 2048,
+          "K": 2048
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.0019321441650390625,
+        "max_rel_err": 7.588235378265381,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 2048,
+          "N": 2048,
+          "K": 2048
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.001968860626220703,
+        "max_rel_err": 2.612903118133545,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 1,
+          "K": 1
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 0.15315783023834229,
+        "max_rel_err": 1.0,
+        "mismatch_frac": 1.0,
+        "error": "value_mismatch: 100.00% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=1.532e-01; first bad flat index 0: got 0 expected 0.153158"
+      },
+      {
+        "shape": {
+          "M": 64,
+          "N": 8192,
+          "K": 128
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019211769104003906,
+        "max_rel_err": 0.10186513513326645,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1000,
+          "N": 1000,
+          "K": 1000
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 0.6545013189315796,
+        "max_rel_err": 67526.484375,
+        "mismatch_frac": 0.8250060081481934,
+        "error": "value_mismatch: 82.50% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=6.545e-01; first bad flat index 1: got -0.997559 expected -0.94768"
+      },
+      {
+        "shape": {
+          "M": 512,
+          "N": 512,
+          "K": 512
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.0018668174743652344,
+        "max_rel_err": 0.11976343393325806,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1000,
+          "N": 1000,
+          "K": 1000
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 0.609869122505188,
+        "max_rel_err": 52851.7734375,
+        "mismatch_frac": 0.8268020153045654,
+        "error": "value_mismatch: 82.68% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=6.099e-01; first bad flat index 0: got -1.32617 expected -1.23152"
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0018715858459472656,
+        "max_rel_err": 0.005625606048852205,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0009872913360595703,
+        "max_rel_err": 0.003304640296846628,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 4096,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019745826721191406,
+        "max_rel_err": 57.0,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 127,
+          "N": 257,
+          "K": 511
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 1.045665979385376,
+        "max_rel_err": 6290.48974609375,
+        "mismatch_frac": 0.9399798512458801,
+        "error": "value_mismatch: 94.00% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=1.046e+00; first bad flat index 0: got -1.11328 expected -0.92647"
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 1,
+          "K": 1
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 0.32300353050231934,
+        "max_rel_err": 1.0,
+        "mismatch_frac": 1.0,
+        "error": "value_mismatch: 100.00% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=3.230e-01; first bad flat index 0: got 0 expected 0.323004"
+      },
+      {
+        "shape": {
+          "M": 127,
+          "N": 257,
+          "K": 511
+        },
+        "dtype": "float16",
+        "seed": 14031735,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 1.1044210195541382,
+        "max_rel_err": 7726.44677734375,
+        "mismatch_frac": 0.939918577671051,
+        "error": "wrong result when the same input buffers are reused with new contents: value_mismatch: 93.99% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=1.104e+00; first bad flat index 0: got 1.76855 expected 1.46926"
+      },
+      {
+        "shape": {
+          "M": 1000,
+          "N": 1000,
+          "K": 1000
+        },
+        "dtype": "float16",
+        "seed": 16031741,
+        "hidden": true,
+        "passed": false,
+        "max_abs_err": 0.639433741569519,
+        "max_rel_err": 37843.73046875,
+        "mismatch_frac": 0.8260650038719177,
+        "error": "wrong result when the same input buffers are reused with new contents: value_mismatch: 82.61% of elements outside tolerance (atol=0.01, rtol=0.01); max_abs_err=6.394e-01; first bad flat index 1: got -0.661133 expected -0.620403"
+      }
+    ],
+    "timings": [],
+    "speedup_vs_eager": null,
+    "speedup_vs_compile": null,
+    "stage_seconds": {
+      "static": 0.0019,
+      "compile": 8.531,
+      "check": 7.014
+    },
+    "seeds": [
+      11,
+      12
+    ],
+    "meta": {
+      "order_seed": 24294,
+      "launch_info": [
+        {
+          "shape": {
+            "M": 512,
+            "N": 512,
+            "K": 512
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 4.768000000000029,
+          "triton_us": 4.768000000000029,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 2048,
+            "N": 2048,
+            "K": 2048
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 128.47900000000004,
+          "triton_us": 128.47900000000004,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 1,
+            "N": 1,
+            "K": 1
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 0.8959999999999582,
+          "triton_us": 0.8959999999999582,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 127,
+            "N": 257,
+            "K": 511
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 10.432000000000016,
+          "triton_us": 10.432000000000016,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 1,
+            "N": 4096,
+            "K": 4096
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 25.663999999999987,
+          "triton_us": 25.663999999999987,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 1000,
+            "N": 1000,
+            "K": 1000
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 27.199999999999818,
+          "triton_us": 27.199999999999818,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 64,
+            "N": 8192,
+            "K": 128
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 2.94399999999996,
+          "triton_us": 2.94399999999996,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 4096,
+            "N": 4096,
+            "K": 4096
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 892.2289999999998,
+          "triton_us": 892.2289999999998,
+          "triton_fraction": 1.0
+        }
+      ],
+      "failure_shape": {
+        "M": 1,
+        "N": 1,
+        "K": 1
+      },
+      "failure_hidden": true,
+      "job_dir": null
+    }
+  },
+  "good/matmul": {
+    "task_id": "l3_matmul",
+    "status": "correct",
+    "reason": "",
+    "message": "",
+    "stage": "check",
+    "findings": [],
+    "shape_results": [
+      {
+        "shape": {
+          "M": 64,
+          "N": 8192,
+          "K": 128
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019502639770507812,
+        "max_rel_err": 0.30434781312942505,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 127,
+          "N": 257,
+          "K": 511
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0009770393371582031,
+        "max_rel_err": 0.0810810774564743,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 512,
+          "N": 512,
+          "K": 512
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.0017004013061523438,
+        "max_rel_err": 2.0,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 4096,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019845962524414062,
+        "max_rel_err": 18.86046600341797,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 2048,
+          "N": 2048,
+          "K": 2048
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.0019321441650390625,
+        "max_rel_err": 7.588235378265381,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 2048,
+          "N": 2048,
+          "K": 2048
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.001968860626220703,
+        "max_rel_err": 2.612903118133545,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 1,
+          "K": 1
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 4.0411949157714844e-05,
+        "max_rel_err": 0.000263858208199963,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 64,
+          "N": 8192,
+          "K": 128
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019211769104003906,
+        "max_rel_err": 0.10186513513326645,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1000,
+          "N": 1000,
+          "K": 1000
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019254684448242188,
+        "max_rel_err": 0.6000000238418579,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 512,
+          "N": 512,
+          "K": 512
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": false,
+        "passed": true,
+        "max_abs_err": 0.0018668174743652344,
+        "max_rel_err": 0.11976343393325806,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1000,
+          "N": 1000,
+          "K": 1000
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019330978393554688,
+        "max_rel_err": 0.29870128631591797,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0018715858459472656,
+        "max_rel_err": 0.005625606048852205,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0009872913360595703,
+        "max_rel_err": 0.003304640296846628,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 4096,
+          "N": 4096,
+          "K": 4096
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0019745826721191406,
+        "max_rel_err": 57.0,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 127,
+          "N": 257,
+          "K": 511
+        },
+        "dtype": "float16",
+        "seed": 11,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 0.0017838478088378906,
+        "max_rel_err": 0.006172839552164078,
+        "mismatch_frac": 0.0,
+        "error": null
+      },
+      {
+        "shape": {
+          "M": 1,
+          "N": 1,
+          "K": 1
+        },
+        "dtype": "float16",
+        "seed": 12,
+        "hidden": true,
+        "passed": true,
+        "max_abs_err": 5.4836273193359375e-06,
+        "max_rel_err": 1.697698826319538e-05,
+        "mismatch_frac": 0.0,
+        "error": null
+      }
+    ],
+    "timings": [],
+    "speedup_vs_eager": null,
+    "speedup_vs_compile": null,
+    "stage_seconds": {
+      "static": 0.0027,
+      "compile": 7.733,
+      "check": 6.762
+    },
+    "seeds": [
+      11,
+      12
+    ],
+    "meta": {
+      "order_seed": 24294,
+      "launch_info": [
+        {
+          "shape": {
+            "M": 512,
+            "N": 512,
+            "K": 512
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 4.927999999999884,
+          "triton_us": 4.927999999999884,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 2048,
+            "N": 2048,
+            "K": 2048
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 130.27199999999993,
+          "triton_us": 130.27199999999993,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 1,
+            "N": 1,
+            "K": 1
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 1.24799999999982,
+          "triton_us": 1.24799999999982,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 127,
+            "N": 257,
+            "K": 511
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 9.82400000000007,
+          "triton_us": 9.82400000000007,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 1,
+            "N": 4096,
+            "K": 4096
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 26.336000000000013,
+          "triton_us": 26.336000000000013,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 1000,
+            "N": 1000,
+            "K": 1000
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 26.40000000000009,
+          "triton_us": 26.40000000000009,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 64,
+            "N": 8192,
+            "K": 128
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 2.9760000000001128,
+          "triton_us": 2.9760000000001128,
+          "triton_fraction": 1.0
+        },
+        {
+          "shape": {
+            "M": 4096,
+            "N": 4096,
+            "K": 4096
+          },
+          "triton_kernels": [
+            "matmul_kernel"
+          ],
+          "n_launches": 1,
+          "gpu_kernels": 1,
+          "gpu_us": 907.6859999999999,
+          "triton_us": 907.6859999999999,
+          "triton_fraction": 1.0
+        }
+      ],
+      "job_dir": null
+    }
+  }
+}

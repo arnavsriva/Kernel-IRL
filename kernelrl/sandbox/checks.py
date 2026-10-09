@@ -107,8 +107,9 @@ def distinct_inputs_check(ctx: Ctx, spec, dtype_name, base_seed) -> None:
         return  # degenerate shape: different inputs, same output
     dev = torch.device(DEVICE, torch.cuda.current_device())
     a_ok = compare(ca_snap, hia, shape, odtype, dev, **ctx.tol(dtype_name))["passed"]
-    replayed = bitwise_equal(cb, ca_snap) and _looks_computed(ca_snap)
-    if (a_ok and bitwise_equal(cb, ca_snap)) or replayed:
+    # Require a computed-looking output: a 1-element or constant output (e.g. a bug that writes
+    # zeros) can be identical across inputs, and even within tolerance, without any caching.
+    if bitwise_equal(cb, ca_snap) and _looks_computed(ca_snap):
         ctx.finding("cached_output", "identical output for two different inputs (cached or hardcoded result)", spec)
     elif a_ok and not bitwise_equal(ca, ca_snap):
         ctx.finding("output_buffer_reused", "a previously returned output was overwritten by a later call", spec)
@@ -134,11 +135,12 @@ def same_address_check(ctx: Ctx, spec, dtype_name, base_seed) -> dict | None:
     hi1, hi2 = reference_hi(ctx.ref.reference, orig), reference_hi(ctx.ref.reference, new)
     dev = torch.device(DEVICE, torch.cuda.current_device())
     tol = ctx.tol(dtype_name)
-    c1_ok = compare(c1s, hi1, shape, odtype, dev, **tol)["passed"]
     r2 = compare(c2, hi2, shape, odtype, dev, **tol)
     if r2["passed"]:
         return None
-    if (c1_ok or _looks_computed(c1s)) and not bitwise_equal(hi1, hi2) and bitwise_equal(c2, c1s):
+    # Same evidence rule as cached_output: a trivial output (found on M=N=K=1, where a constant 0 was
+    # within tolerance of the reference) cannot distinguish a pointer-keyed cache from a plain bug.
+    if _looks_computed(c1s) and not bitwise_equal(hi1, hi2) and bitwise_equal(c2, c1s):
         ctx.finding("pointer_keyed_cache", "stale result returned when input buffers were reused with new contents", spec)
         return None
     return {"shape": spec["dims"], "dtype": dtype_name, "seed": sd, "hidden": bool(spec.get("hidden")),

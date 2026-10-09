@@ -49,3 +49,17 @@ def test_candidate_patches_are_still_caught():
     """)
     for name in ("torch.softmax", "torch.cuda.Event.elapsed_time", "time.perf_counter", "torch.Tensor.sum"):
         assert name in out, out
+
+
+def test_looks_computed_evidence_rule():
+    """Cache-hack findings need outputs that could only come from real computation."""
+    import torch
+
+    from kernelrl.sandbox.checks import _looks_computed
+
+    assert not _looks_computed(torch.zeros(1))            # single element (the M=N=K=1 false positive)
+    assert not _looks_computed(torch.zeros(64, 64))       # constant (bug writing zeros)
+    assert not _looks_computed(torch.full((8,), float("nan")))  # poisoned / never written
+    assert not _looks_computed(torch.arange(4))           # non-float
+    assert _looks_computed(torch.randn(64, 64))           # a real result
+    assert _looks_computed(torch.randn(2).half())
