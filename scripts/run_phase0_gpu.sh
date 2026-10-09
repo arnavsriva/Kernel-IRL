@@ -32,6 +32,7 @@ for step in $STEPS; do
   echo "=================== $step ==================="
   case "$step" in
     probe) $PY scripts/gpu_probe.py --out docs/results/gpu_probe.json ;;
+    diagnose) FIXTURES="$FIXTURES" $PY scripts/diagnose_fixture.py 2>&1 | tee docs/results/diagnose_fixture.log ;;
     validate) $PY -m kernelrl.tasks.validate --device cuda ;;
     verdicts) $PY -m pytest -v -rs --durations=15 tests/ 2>&1 | tee docs/results/verdicts_pytest.log ;;  # pipefail propagates pytest failures   # includes tests/gpu
     eval)

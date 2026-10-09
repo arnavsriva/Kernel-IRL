@@ -41,7 +41,7 @@ image = (
 vol = modal.Volume.from_name("kernelrl-phase0", create_if_missing=True)
 app = modal.App("kernelrl-phase0", image=image)
 
-STEP_TIMEOUT = {"probe": 1800, "validate": 3600, "verdicts": 3 * 3600, "eval": 10 * 3600, "bench": 2 * 3600}
+STEP_TIMEOUT = {"probe": 1800, "diagnose": 1800, "validate": 3600, "verdicts": 3 * 3600, "eval": 10 * 3600, "bench": 2 * 3600}
 LOCAL_STEPS = ("fetch",)  # no GPU: copy results/ from the Volume (use after a local disconnect)
 
 
@@ -67,12 +67,12 @@ def _collect_results() -> dict[str, str]:
 
 
 @app.function(gpu=GPU, timeout=max(STEP_TIMEOUT.values()), volumes={VOL: vol}, cpu=8, memory=49152)
-def run_step(step: str, eval_args: str = "", bench_args: str = "", run_id: str = "") -> dict:
+def run_step(step: str, eval_args: str = "", bench_args: str = "", run_id: str = "", fixtures: str = "") -> dict:
     import subprocess
 
     _prepare_workdir()
     env = {**os.environ, "STEPS": step, "PY": "python3", "GPU": "0", "EVAL_ARGS": eval_args,
-           "BENCH_ARGS": bench_args}
+           "BENCH_ARGS": bench_args, "FIXTURES": fixtures}
     if run_id:
         env["RUN_ID"] = run_id
     subprocess.run(["nvidia-smi"], check=False)
@@ -98,14 +98,14 @@ def fetch_results() -> int:
 
 
 @app.local_entrypoint()
-def main(step: str = "probe", eval_args: str = "", bench_args: str = "", run_id: str = ""):
+def main(step: str = "probe", eval_args: str = "", bench_args: str = "", run_id: str = "", fixtures: str = ""):
     if step in LOCAL_STEPS:
         fetch_results()
         return
     if step not in STEP_TIMEOUT:
         raise SystemExit(f"unknown step {step!r}; choose from {list(STEP_TIMEOUT) + list(LOCAL_STEPS)}")
     print(f"[modal] step={step} gpu={GPU} image={IMAGE_TAG}")
-    res = run_step.remote(step, eval_args, bench_args, run_id)
+    res = run_step.remote(step, eval_args, bench_args, run_id, fixtures)
     dest = REPO / "docs" / "results"
     dest.mkdir(parents=True, exist_ok=True)
     for name, text in res["files"].items():
