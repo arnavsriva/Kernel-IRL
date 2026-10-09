@@ -93,7 +93,9 @@ def main() -> None:
     try:
         _setup_torch()
         from kernelrl.common.io import atomic_write_json  # noqa: F401  (import before candidate)
-        from kernelrl.sandbox.child_utils import ApiSentinel, Progress, StageFailure
+        from kernelrl.sandbox.child_utils import ApiSentinel, Progress, StageFailure, preload_trusted_modules
+
+        preload_trusted_modules()  # before any ApiSentinel snapshot
 
         try:
             if stage == "probe":

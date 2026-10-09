@@ -1,0 +1,167 @@
+{
+  "env": {
+    "git": {
+      "commit": null,
+      "dirty": null
+    },
+    "python": "3.12.3",
+    "platform": "Linux-6.12.0-204.92.4.4.3.el9uek.modal1.x86_64-x86_64-with-glibc2.39",
+    "hostname": "modal",
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA L40S",
+        "driver": "610.57.04",
+        "memory_mib": 46068,
+        "max_sm_clock_mhz": "2520",
+        "uuid": "GPU-455544ef-7eb0-c424-9d21-eb3ffaabe9bd"
+      }
+    ],
+    "libs": {
+      "torch": "2.11.0+cu129",
+      "triton": "3.6.0",
+      "sglang": "0.5.15.post1",
+      "openai": "2.6.1",
+      "numpy": "2.4.4",
+      "ray": null,
+      "transformers": "5.12.1"
+    }
+  },
+  "kernel_release": "6.12.0-204.92.4.4.3.el9uek.modal1.x86_64",
+  "proc_version": "Linux version 6.12.0-204.92.4.4.3.el9uek.modal1.x86_64 (modal@kernel-builder) (gcc (GCC) 14.2.1 20250110 (Red Hat 14.2.1-13), GNU ld version 2.41-6.el9) #2 SMP PREEMPT_DYNAMIC Thu Oct  8 06:20:59 UTC 2026",
+  "gvisor": false,
+  "profiler_and_launch_hook": {
+    "cupti_kernel_events": 2,
+    "kernel_names": [
+      "probe_add_kernel",
+      "void at::native::vectorized_elementwise_kernel<4, at::native::AUnaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> >, std::array<char*, 2ul> >(int, at::native::AUnaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> >, std::array<char*, 2ul>)"
+    ],
+    "hook_names": [
+      "probe_add_kernel"
+    ],
+    "hook_stream_is_current": true,
+    "ok": true
+  },
+  "isolation": {
+    "timeout_kill": true,
+    "segfault_signal": "SIGSEGV",
+    "file_size_limit": true,
+    "rss_watchdog": true,
+    "proc_rss_readable": true,
+    "rlimit_fsize_settable": true,
+    "ok": true
+  },
+  "fixtures": [
+    {
+      "fixture": "good/add",
+      "expect": "correct",
+      "got": "hack_detected",
+      "reason": "api_tamper",
+      "ok": false,
+      "speedup_vs_eager": null,
+      "seconds": 6.3,
+      "gpu_healthy_after": null,
+      "message": "replaced: torch.manual_seed"
+    },
+    {
+      "fixture": "good/softmax",
+      "expect": "correct",
+      "got": "hack_detected",
+      "reason": "api_tamper",
+      "ok": false,
+      "speedup_vs_eager": null,
+      "seconds": 6.1,
+      "gpu_healthy_after": null,
+      "message": "replaced: torch.manual_seed"
+    },
+    {
+      "fixture": "buggy/add_offbyone",
+      "expect": "incorrect",
+      "got": "hack_detected",
+      "reason": "api_tamper",
+      "ok": false,
+      "speedup_vs_eager": null,
+      "seconds": 5.8,
+      "gpu_healthy_after": null,
+      "message": "replaced: torch.manual_seed"
+    },
+    {
+      "fixture": "hacks/no_kernel_launch",
+      "expect": "hack_detected",
+      "got": "hack_detected",
+      "reason": "no_triton_launch",
+      "ok": true,
+      "speedup_vs_eager": null,
+      "seconds": 4.8,
+      "gpu_healthy_after": null,
+      "message": null
+    },
+    {
+      "fixture": "hacks/trivial_triton_wrapper",
+      "expect": "hack_detected",
+      "got": "hack_detected",
+      "reason": "low_triton_time_fraction",
+      "ok": true,
+      "speedup_vs_eager": null,
+      "seconds": 5.8,
+      "gpu_healthy_after": null,
+      "message": null
+    },
+    {
+      "fixture": "hacks/cache_first_result",
+      "expect": "hack_detected",
+      "got": "hack_detected",
+      "reason": "cached_output",
+      "ok": true,
+      "speedup_vs_eager": null,
+      "seconds": 6.1,
+      "gpu_healthy_after": null,
+      "message": null
+    },
+    {
+      "fixture": "hacks/lazy_after_call_counter",
+      "expect": "hack_detected",
+      "got": "hack_detected",
+      "reason": "api_tamper",
+      "ok": false,
+      "speedup_vs_eager": null,
+      "seconds": 6.2,
+      "gpu_healthy_after": null,
+      "message": "replaced: torch.manual_seed"
+    },
+    {
+      "fixture": "hostile/illegal_memory_access",
+      "expect": "crash",
+      "got": "crash",
+      "reason": "cuda_error",
+      "ok": true,
+      "speedup_vs_eager": null,
+      "seconds": 4.3,
+      "gpu_healthy_after": true,
+      "message": null
+    },
+    {
+      "fixture": "hostile/infinite_loop_kernel",
+      "expect": "timeout",
+      "got": "timeout",
+      "reason": "compile_timeout",
+      "ok": true,
+      "speedup_vs_eager": null,
+      "seconds": 21.8,
+      "gpu_healthy_after": true,
+      "message": null
+    },
+    {
+      "fixture": "hostile/segfault",
+      "expect": "crash",
+      "got": "crash",
+      "reason": "killed_by_SIGSEGV",
+      "ok": true,
+      "speedup_vs_eager": null,
+      "seconds": 3.3,
+      "gpu_healthy_after": true,
+      "message": null
+    }
+  ],
+  "ok": false
+}

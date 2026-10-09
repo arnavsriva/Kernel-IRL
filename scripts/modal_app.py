@@ -1,12 +1,17 @@
 """Run the Phase 0 GPU steps on Modal.
 
 GPU type is read at launch (default "H100!" = no silent upgrade to H200, so timings are comparable):
-  modal run scripts/modal_app.py --step probe                        # ~5-10 GPU-minutes, do this first
-  KERNELRL_GPU=L40S modal run scripts/modal_app.py --step verdicts   # cheaper GPU for debugging
-  modal run scripts/modal_app.py --step validate
-  modal run scripts/modal_app.py --step eval --eval-args "--k 2 --tasks l1_vector_add l2_softmax"   # smoke
-  modal run scripts/modal_app.py --step eval                         # full baseline (hours)
-  modal run scripts/modal_app.py --step bench
+  modal run --detach scripts/modal_app.py --step probe                        # ~5-10 GPU-minutes, do this first
+  KERNELRL_GPU=L40S modal run --detach scripts/modal_app.py --step verdicts   # cheaper GPU for debugging
+  modal run --detach scripts/modal_app.py --step validate
+  modal run --detach scripts/modal_app.py --step eval --eval-args "--k 2 --tasks l1_vector_add l2_softmax"   # smoke
+  modal run --detach scripts/modal_app.py --step eval                         # full baseline (hours)
+  modal run --detach scripts/modal_app.py --step bench
+  modal run scripts/modal_app.py --step fetch                                 # results from the Volume, no GPU
+
+Always pass --detach for GPU steps (modal run --detach ...): without it, a dropped connection from
+your machine stops the app. If the local client disconnects, the run continues and `--step fetch`
+retrieves the results afterwards.
 
 The repo is copied into the container, so the run uses your current working tree. runs/, results,
 and the baseline-timing cache live on a Modal Volume, so an interrupted eval resumes. Result files
@@ -37,6 +42,7 @@ vol = modal.Volume.from_name("kernelrl-phase0", create_if_missing=True)
 app = modal.App("kernelrl-phase0", image=image)
 
 STEP_TIMEOUT = {"probe": 1800, "validate": 3600, "verdicts": 3 * 3600, "eval": 10 * 3600, "bench": 2 * 3600}
+LOCAL_STEPS = ("fetch",)  # no GPU: copy results/ from the Volume (use after a local disconnect)
 
 
 def _prepare_workdir() -> None:
@@ -78,10 +84,26 @@ def run_step(step: str, eval_args: str = "", bench_args: str = "", run_id: str =
     return {"returncode": rc, "files": _collect_results()}
 
 
+def fetch_results() -> int:
+    """Copy every file under results/ on the Volume into docs/results/ (no container, no GPU)."""
+    dest = REPO / "docs" / "results"
+    dest.mkdir(parents=True, exist_ok=True)
+    n = 0
+    for entry in vol.listdir("results"):
+        name = Path(entry.path).name
+        (dest / name).write_bytes(b"".join(vol.read_file(entry.path)))
+        n += 1
+    print(f"[modal] fetched {n} result files from Volume 'kernelrl-phase0' into {dest}")
+    return n
+
+
 @app.local_entrypoint()
 def main(step: str = "probe", eval_args: str = "", bench_args: str = "", run_id: str = ""):
+    if step in LOCAL_STEPS:
+        fetch_results()
+        return
     if step not in STEP_TIMEOUT:
-        raise SystemExit(f"unknown step {step!r}; choose from {list(STEP_TIMEOUT)}")
+        raise SystemExit(f"unknown step {step!r}; choose from {list(STEP_TIMEOUT) + list(LOCAL_STEPS)}")
     print(f"[modal] step={step} gpu={GPU} image={IMAGE_TAG}")
     res = run_step.remote(step, eval_args, bench_args, run_id)
     dest = REPO / "docs" / "results"

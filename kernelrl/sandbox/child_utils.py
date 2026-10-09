@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import errno
+import inspect
 import json
 import time
 import traceback
@@ -113,6 +114,16 @@ def nbytes_of(shape: tuple, dtype: torch.dtype) -> int:
     return n * torch.empty((), dtype=dtype).element_size()
 
 
+def preload_trusted_modules() -> None:
+    """Import torch submodules that patch torch's namespace on first import, before the
+    ApiSentinel snapshot. torch._dynamo wraps torch.manual_seed when it loads
+    (torch/_dynamo/__init__.py), and the profiler/compile paths load it lazily. Without this,
+    trusted harness code would trip the sentinel. Candidates cannot import these modules
+    (static allowlist), so the sentinel still sees every candidate-made replacement."""
+    import torch._dynamo  # noqa: F401
+    import torch.profiler  # noqa: F401
+
+
 class ApiSentinel:
     """Snapshot identities of callables a candidate could monkeypatch to fake results or
     timings (torch ops, CUDA events, timers, the reference module). Any change => tamper."""
@@ -130,14 +141,31 @@ class ApiSentinel:
             self.targets[f"extra{i}:{getattr(m, '__name__', '?')}"] = m
         self.snap = {}
         for label, obj in self.targets.items():
-            for k, v in list(vars(obj).items()):
-                if not k.startswith("_") and callable(v):
+            for k in self._names(obj):
+                v = self._get(obj, k)
+                if callable(v) or isinstance(v, (property, staticmethod, classmethod)):
                     self.snap[(label, k)] = v
+
+    @staticmethod
+    def _names(obj) -> list[str]:
+        # Classes: every public name through the MRO (torch.Tensor.sum lives on torch._C.TensorBase,
+        # so patching it adds a shadowing entry on torch.Tensor that vars() alone would miss).
+        names = dir(obj) if isinstance(obj, type) else list(vars(obj))
+        return [k for k in names if not k.startswith("_")]
+
+    @staticmethod
+    def _get(obj, k):
+        if isinstance(obj, type):
+            try:
+                return inspect.getattr_static(obj, k)  # raw descriptor, stable identity, no binding
+            except AttributeError:
+                return None
+        return vars(obj).get(k)
 
     def changed(self) -> list[str]:
         out = []
         for (label, k), v in self.snap.items():
-            if vars(self.targets[label]).get(k) is not v:
+            if self._get(self.targets[label], k) is not v:
                 out.append(f"{label}.{k}")
         return out
 
