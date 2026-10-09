@@ -42,6 +42,17 @@ Nothing GPU-side has been executed yet. On the box, run
    `docs/results/`.
 4. Run the prefix-cache benchmark and write the interpretation.
 
+### Running on Modal (2026-10-09)
+The user has Modal credits, and Modal is now the default GPU platform. `scripts/modal_app.py` runs
+each step in the `slimerl/sglang:v0.5.15.post1-cu129` image with a Volume for runs, results, the
+baseline cache, and HF weights. Start with `modal run scripts/modal_app.py --step probe`.
+
+Modal runs containers under gVisor. The sandbox's launch check needs CUPTI kernel traces from
+`torch.profiler`, and no public documentation confirms they work under gVisor.
+`scripts/gpu_probe.py` checks this first, along with the Triton launch hook, process-group kill,
+the RSS watchdog, `RLIMIT_FSIZE`, and 10 fixtures end to end. If CUPTI tracing is unavailable, the
+launch check needs a fallback before any eval; it must not be skipped.
+
 ### Open issues and decisions
 - Clock locking for benchmarks (`nvidia-smi -lgc`) needs root, so ask before changing system state.
 - The Docker image is over 20 GB, so the setup script requires an explicit flag.

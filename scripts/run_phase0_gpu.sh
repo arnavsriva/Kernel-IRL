@@ -2,11 +2,12 @@
 # Run every GPU-dependent Phase 0 step in order on one GPU. Stops at the first failure.
 #   bash scripts/run_phase0_gpu.sh            # all steps
 #   STEPS="validate verdicts" bash scripts/run_phase0_gpu.sh
+#   EVAL_ARGS="--k 2 --tasks l1_vector_add" STEPS=eval bash scripts/run_phase0_gpu.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=${PY:-python}
 GPU=${GPU:-0}
-STEPS=${STEPS:-"validate verdicts eval bench"}
+STEPS=${STEPS:-"probe validate verdicts eval bench"}
 RUN_ID=${RUN_ID:-qwen3-4b_nothink_k8_t2}
 export CUDA_VISIBLE_DEVICES=$GPU
 
@@ -30,18 +31,19 @@ mkdir -p runs
 for step in $STEPS; do
   echo "=================== $step ==================="
   case "$step" in
+    probe) $PY scripts/gpu_probe.py --out docs/results/gpu_probe.json ;;
     validate) $PY -m kernelrl.tasks.validate --device cuda ;;
     verdicts) $PY -m pytest -q tests/ -rs ;;   # includes tests/gpu (adversarial verdicts)
     eval)
       start_server on 30000
-      $PY -m kernelrl.eval.run_eval --run-id "$RUN_ID" --server-url http://127.0.0.1:30000/v1
+      $PY -m kernelrl.eval.run_eval --run-id "$RUN_ID" --server-url http://127.0.0.1:30000/v1 ${EVAL_ARGS:-}
       stop_server on ;;
     bench)
       start_server on 30000
-      $PY -m kernelrl.bench.prefix_cache run --label radix_on --server-url http://127.0.0.1:30000/v1
+      $PY -m kernelrl.bench.prefix_cache run --label radix_on --server-url http://127.0.0.1:30000/v1 ${BENCH_ARGS:-}
       stop_server on
       start_server off 30001
-      $PY -m kernelrl.bench.prefix_cache run --label radix_off --server-url http://127.0.0.1:30001/v1
+      $PY -m kernelrl.bench.prefix_cache run --label radix_off --server-url http://127.0.0.1:30001/v1 ${BENCH_ARGS:-}
       stop_server off
       $PY -m kernelrl.bench.prefix_cache compare docs/results/prefix_cache_radix_on.json \
         docs/results/prefix_cache_radix_off.json ;;
