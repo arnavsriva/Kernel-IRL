@@ -41,3 +41,43 @@ def test_two_turn_pipeline(tmp_path, monkeypatch):
     n_lines = len((tmp_path / "runs" / "t" / "turn1_results.jsonl").read_text().splitlines())
     assert run_eval.main(args) == 0
     assert len((tmp_path / "runs" / "t" / "turn1_results.jsonl").read_text().splitlines()) == n_lines
+
+
+def test_real_generator_survives_two_event_loops_under_contention(tmp_path, monkeypatch):
+    """Regression: the first full baseline crashed at turn 2 ('Semaphore is bound to a different
+    event loop') because one Generator was shared by two asyncio.run() calls with > concurrency
+    requests queued. Uses the real Generator with a stubbed OpenAI call."""
+    import asyncio
+
+    from kernelrl.serving import client as client_mod
+
+    async def fake_create(**kw):
+        await asyncio.sleep(0.001)
+
+        class U:
+            prompt_tokens, completion_tokens, prompt_tokens_details = 10, 5, None
+
+        class M:
+            content, reasoning_content = CODE, None
+
+        class C:
+            message, finish_reason = M(), "stop"
+
+        class R:
+            choices, usage = [C()], U()
+        return R()
+
+    real_init = client_mod.Generator.__init__
+
+    def init(self, *a, **k):
+        real_init(self, *a, **k)
+        monkeypatch.setattr(self.client.chat.completions, "create", fake_create)
+
+    monkeypatch.setattr(client_mod.Generator, "__init__", init)
+    monkeypatch.setattr(run_eval, "evaluate", fake_evaluate)
+    monkeypatch.setattr(run_eval, "server_info", lambda url: {})
+    args = ["--run-id", "c", "--tasks", "l1_relu", "--k", "12", "--turns", "2", "--concurrency", "2",
+            "--out-dir", str(tmp_path / "runs"), "--results-dir", str(tmp_path / "results")]
+    assert run_eval.main(args) == 0
+    lines = (tmp_path / "runs" / "c" / "turn2_samples.jsonl").read_text().splitlines()
+    assert len(lines) == 12
