@@ -1,0 +1,1247 @@
+{
+  "created_utc": "2026-10-10T16:45:18+00:00",
+  "env": {
+    "git": {
+      "commit": null,
+      "dirty": null
+    },
+    "python": "3.12.3",
+    "platform": "Linux-6.12.0-204.92.4.4.3.el9uek.modal1.x86_64-x86_64-with-glibc2.39",
+    "hostname": "modal",
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA H100 80GB HBM3",
+        "driver": "580.95.05",
+        "memory_mib": 81559,
+        "max_sm_clock_mhz": "1980",
+        "uuid": "GPU-7919318d-7ce5-9645-53f7-6bac799ed57f",
+        "driver_cuda_version": "13.0"
+      }
+    ],
+    "libs": {
+      "torch": "2.11.0+cu129",
+      "triton": "3.6.0",
+      "sglang": "0.5.15.post1",
+      "openai": "2.6.1",
+      "numpy": "2.4.4",
+      "ray": null,
+      "transformers": "5.12.1"
+    }
+  },
+  "run_id": "qwen3-4b_v2_think_k8_t2",
+  "model": "Qwen/Qwen3-4B",
+  "k": 8,
+  "turns": 2,
+  "thinking": true,
+  "prompt": "v2",
+  "sampling": {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "presence_penalty": 1.5,
+    "max_tokens": 24576
+  },
+  "seed": 0,
+  "tasks": [
+    "l1_clamp",
+    "l1_col_sum",
+    "l1_exp",
+    "l1_fused_add_relu",
+    "l1_gelu",
+    "l1_mul",
+    "l1_relu",
+    "l1_row_max",
+    "l1_row_sum",
+    "l1_scalar_affine",
+    "l1_silu",
+    "l1_vector_add",
+    "l2_bias_gelu",
+    "l2_cross_entropy",
+    "l2_cumsum",
+    "l2_layernorm",
+    "l2_log_softmax",
+    "l2_logsumexp",
+    "l2_mean_center",
+    "l2_residual_rmsnorm",
+    "l2_rmsnorm",
+    "l2_row_l2norm",
+    "l2_softmax",
+    "l2_swiglu",
+    "l3_attention",
+    "l3_attention_causal",
+    "l3_batched_matmul",
+    "l3_matmul",
+    "l3_matmul_bias_relu",
+    "l3_matmul_scale_residual"
+  ],
+  "server": {
+    "version": "0.5.15.post1",
+    "model_path": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "disable_radix_cache": false,
+    "mem_fraction_static": 0.5,
+    "context_length": 32768,
+    "random_seed": 0,
+    "reasoning_parser": "qwen3",
+    "enable_metrics": true,
+    "tp_size": 1,
+    "dtype": "auto",
+    "max_running_requests": null
+  },
+  "sandbox_config": {
+    "methodology_version": 1,
+    "timeouts_s": {
+      "compile": 180,
+      "check": 180,
+      "bench": 240,
+      "baseline": 900,
+      "probe": 60
+    },
+    "limits": {
+      "host_rss_gb": 24,
+      "max_file_bytes": 268435456,
+      "max_source_bytes": 65536,
+      "watchdog_interval_s": 0.05
+    },
+    "correctness": {
+      "num_seeds": 2,
+      "fixed_seeds": null,
+      "poison_allocator": true
+    },
+    "hack_checks": {
+      "distinct_inputs": true,
+      "mutation_after_call": true,
+      "same_address_reuse": true,
+      "call_order_permutation": true,
+      "launch_check": true,
+      "min_triton_time_fraction": 0.8,
+      "require_profiler": true,
+      "api_tamper_sentinel": true
+    },
+    "benchmark": {
+      "warmup": 25,
+      "iters": 100,
+      "l2_flush_bytes": 268435456,
+      "input_variants": 2,
+      "verify_iters": 4,
+      "bench_seed": 1234,
+      "inproc_reference_ratio_limit": 2.0,
+      "wall_over_event_limit": 3.0,
+      "wall_over_event_min_ms": 0.1,
+      "wall_iters": 20,
+      "compile_mode": "default"
+    },
+    "feedback": {
+      "max_error_chars": 1500,
+      "include_profiler": false,
+      "max_shapes_listed": 6
+    },
+    "probe_after_failure": true,
+    "child_env_passthrough": [
+      "PATH",
+      "LD_LIBRARY_PATH",
+      "CUDA_HOME",
+      "HOME",
+      "LANG",
+      "LC_ALL",
+      "TRITON_PTXAS_PATH",
+      "NVIDIA_VISIBLE_DEVICES"
+    ]
+  },
+  "summary": {
+    "k": 8,
+    "turn1": {
+      "n_samples": 240,
+      "pass@1": 0.22083333333333333,
+      "pass@8": 0.5666666666666667,
+      "by_level": {
+        "1": {
+          "pass@1": 0.4583333333333333,
+          "pass@8": 1.0
+        },
+        "2": {
+          "pass@1": 0.09375,
+          "pass@8": 0.4166666666666667
+        },
+        "3": {
+          "pass@1": 0.0,
+          "pass@8": 0.0
+        }
+      },
+      "status_counts": {
+        "correct": 53,
+        "incorrect": 28,
+        "hack_detected": 1,
+        "static_reject": 8,
+        "compile_error": 121,
+        "crash": 29,
+        "timeout": 0
+      },
+      "static_reject_reasons": {
+        "missing_entrypoint": 3,
+        "source_too_large": 2,
+        "forbidden_tensor_method": 1,
+        "no_code_found": 1,
+        "forbidden_api": 1
+      },
+      "hack_reasons": {
+        "no_triton_launch": 1
+      },
+      "hack_detected": 1,
+      "static_rule_violations": 2,
+      "speedup_vs_eager_geomean_correct": 0.5800052429544155,
+      "speedup_vs_eager_median_correct": 0.9797030500662623,
+      "speedup_vs_compile_geomean_correct": 0.4499272543318682,
+      "fast_1_frac": 0.075,
+      "extraction_methods": {
+        "fenced": 233,
+        "fenced_incomplete": 6,
+        "none": 1
+      },
+      "finish_reasons": {
+        "stop": 235,
+        "length": 5
+      },
+      "infra_errors": 1,
+      "per_task": {
+        "l1_clamp": {
+          "level": 1,
+          "n": 8,
+          "correct": 6,
+          "pass@1": 0.75,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 6,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": 0.09104409368635845,
+          "best_speedup_vs_eager": 0.9996015543085682,
+          "speedup_vs_compile_geomean": 0.09138982711539777,
+          "mean_reward": 0.22499999999999998
+        },
+        "l1_col_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 1,
+            "static_reject": 1,
+            "correct": 1,
+            "crash": 2,
+            "compile_error": 3
+          },
+          "speedup_vs_eager_geomean": 0.5659363674456678,
+          "best_speedup_vs_eager": 0.5659363674456678,
+          "speedup_vs_compile_geomean": 0.44945217468339005,
+          "mean_reward": 0.0375
+        },
+        "l1_exp": {
+          "level": 1,
+          "n": 8,
+          "correct": 4,
+          "pass@1": 0.5,
+          "pass@8": 1.0,
+          "statuses": {
+            "compile_error": 2,
+            "correct": 4,
+            "crash": 1,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 0.9726369366546886,
+          "best_speedup_vs_eager": 0.977444433362475,
+          "speedup_vs_compile_geomean": 0.9807313461387812,
+          "mean_reward": 0.15
+        },
+        "l1_fused_add_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 3,
+            "incorrect": 1,
+            "compile_error": 4
+          },
+          "speedup_vs_eager_geomean": 1.3872417979334024,
+          "best_speedup_vs_eager": 1.4343428035744532,
+          "speedup_vs_compile_geomean": 0.947378717281329,
+          "mean_reward": 0.17447877959180064
+        },
+        "l1_gelu": {
+          "level": 1,
+          "n": 8,
+          "correct": 2,
+          "pass@1": 0.25,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 2,
+            "compile_error": 5,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 0.9618228200174428,
+          "best_speedup_vs_eager": 0.9684733575378787,
+          "speedup_vs_compile_geomean": 0.9723776750672817,
+          "mean_reward": 0.075
+        },
+        "l1_mul": {
+          "level": 1,
+          "n": 8,
+          "correct": 6,
+          "pass@1": 0.75,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 6,
+            "compile_error": 1,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": 0.9761463968738422,
+          "best_speedup_vs_eager": 0.9801256775022307,
+          "speedup_vs_compile_geomean": 0.9821702582559407,
+          "mean_reward": 0.22499999999999998
+        },
+        "l1_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 5,
+          "pass@1": 0.625,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 5,
+            "crash": 1,
+            "compile_error": 2
+          },
+          "speedup_vs_eager_geomean": 0.988801793333852,
+          "best_speedup_vs_eager": 0.9941835127536345,
+          "speedup_vs_compile_geomean": 1.00203497159596,
+          "mean_reward": 0.1875
+        },
+        "l1_row_max": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 6,
+            "compile_error": 1,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 1.2108735229962952,
+          "best_speedup_vs_eager": 1.2108735229962952,
+          "speedup_vs_compile_geomean": 0.9272171408483486,
+          "mean_reward": 0.04957710795805173
+        },
+        "l1_row_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 5,
+          "pass@1": 0.625,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 5,
+            "compile_error": 2,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 1.2106743463330814,
+          "best_speedup_vs_eager": 1.212770463063472,
+          "speedup_vs_compile_geomean": 0.9208871915369318,
+          "mean_reward": 0.24783362417669674
+        },
+        "l1_scalar_affine": {
+          "level": 1,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 3,
+            "compile_error": 4,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 0.06681096532633886,
+          "best_speedup_vs_eager": 1.6138508209765814,
+          "speedup_vs_compile_geomean": 0.040292657012534885,
+          "mean_reward": 0.14270969117375884
+        },
+        "l1_silu": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "compile_error": 7,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 0.9633432671806119,
+          "best_speedup_vs_eager": 0.9633432671806119,
+          "speedup_vs_compile_geomean": 0.9521913568158681,
+          "mean_reward": 0.0375
+        },
+        "l1_vector_add": {
+          "level": 1,
+          "n": 8,
+          "correct": 7,
+          "pass@1": 0.875,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 7,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 0.14132087520745468,
+          "best_speedup_vs_eager": 0.9719639708765162,
+          "speedup_vs_compile_geomean": 0.14278509952466614,
+          "mean_reward": 0.2625
+        },
+        "l2_bias_gelu": {
+          "level": 2,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 2,
+            "compile_error": 4,
+            "crash": 1,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 4.762216016389916,
+          "best_speedup_vs_eager": 4.762216016389916,
+          "speedup_vs_compile_geomean": 1.0339561119788774,
+          "mean_reward": 0.125
+        },
+        "l2_cross_entropy": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 7,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_cumsum": {
+          "level": 2,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "compile_error": 6,
+            "crash": 1,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 0.34711494632448997,
+          "best_speedup_vs_eager": 0.34711494632448997,
+          "speedup_vs_compile_geomean": 0.1018596796867826,
+          "mean_reward": 0.0375
+        },
+        "l2_layernorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 7,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_log_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 2,
+            "compile_error": 6
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_logsumexp": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 7,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_mean_center": {
+          "level": 2,
+          "n": 8,
+          "correct": 2,
+          "pass@1": 0.25,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 2,
+            "compile_error": 4,
+            "correct": 2
+          },
+          "speedup_vs_eager_geomean": 1.6317031808415567,
+          "best_speedup_vs_eager": 1.633238067139085,
+          "speedup_vs_compile_geomean": 0.8735697129936136,
+          "mean_reward": 0.13680813135253078
+        },
+        "l2_residual_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 1,
+            "compile_error": 7
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_row_l2norm": {
+          "level": 2,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 3,
+            "compile_error": 3,
+            "incorrect": 2
+          },
+          "speedup_vs_eager_geomean": 1.7430544033616093,
+          "best_speedup_vs_eager": 1.7462102668460615,
+          "speedup_vs_compile_geomean": 0.8673867484822151,
+          "mean_reward": 0.21771230985016443
+        },
+        "l2_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 1,
+            "compile_error": 7
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_swiglu": {
+          "level": 2,
+          "n": 8,
+          "correct": 2,
+          "pass@1": 0.25,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 1,
+            "compile_error": 4,
+            "correct": 2,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": 4.576285633462647,
+          "best_speedup_vs_eager": 4.599740333447048,
+          "speedup_vs_compile_geomean": 0.982156668503147,
+          "mean_reward": 0.2857142857142857
+        },
+        "l3_attention": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 4,
+            "compile_error": 3,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_attention_causal": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 5,
+            "compile_error": 1,
+            "static_reject": 1,
+            "hack_detected": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_batched_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 4,
+            "crash": 2,
+            "static_reject": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 4,
+            "compile_error": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_bias_relu": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 2,
+            "static_reject": 1,
+            "compile_error": 4,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_scale_residual": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 4,
+            "static_reject": 3,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        }
+      }
+    },
+    "turn2": {
+      "n_samples": 240,
+      "pass@1": 0.24166666666666667,
+      "pass@8": 0.5666666666666667,
+      "by_level": {
+        "1": {
+          "pass@1": 0.46875,
+          "pass@8": 1.0
+        },
+        "2": {
+          "pass@1": 0.13541666666666666,
+          "pass@8": 0.4166666666666667
+        },
+        "3": {
+          "pass@1": 0.0,
+          "pass@8": 0.0
+        }
+      },
+      "status_counts": {
+        "correct": 58,
+        "incorrect": 36,
+        "hack_detected": 1,
+        "static_reject": 6,
+        "compile_error": 121,
+        "crash": 18,
+        "timeout": 0
+      },
+      "static_reject_reasons": {
+        "source_too_large": 2,
+        "no_code_found": 2,
+        "forbidden_api": 1,
+        "missing_entrypoint": 1
+      },
+      "hack_reasons": {
+        "low_triton_time_fraction": 1
+      },
+      "hack_detected": 1,
+      "static_rule_violations": 1,
+      "speedup_vs_eager_geomean_correct": 0.5392641723744765,
+      "speedup_vs_eager_median_correct": 0.9799323706267467,
+      "speedup_vs_compile_geomean_correct": 0.3828339094143846,
+      "fast_1_frac": 0.09166666666666666,
+      "extraction_methods": {
+        "fenced": 235,
+        "fenced_incomplete": 3,
+        "none": 2
+      },
+      "finish_reasons": {
+        "stop": 236,
+        "length": 4
+      },
+      "infra_errors": 0,
+      "per_task": {
+        "l1_clamp": {
+          "level": 1,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 4,
+            "compile_error": 1,
+            "correct": 3
+          },
+          "speedup_vs_eager_geomean": 0.9859656753152525,
+          "best_speedup_vs_eager": 0.995530081076321,
+          "speedup_vs_compile_geomean": 0.9881388341525394,
+          "mean_reward": 0.11249999999999999
+        },
+        "l1_col_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 3,
+            "compile_error": 4,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 0.5609893707779909,
+          "best_speedup_vs_eager": 0.561912736035779,
+          "speedup_vs_compile_geomean": 0.4449120726237304,
+          "mean_reward": 0.11249999999999999
+        },
+        "l1_exp": {
+          "level": 1,
+          "n": 8,
+          "correct": 5,
+          "pass@1": 0.625,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 1,
+            "compile_error": 1,
+            "correct": 5,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": 0.5836373292174979,
+          "best_speedup_vs_eager": 0.9882140828325006,
+          "speedup_vs_compile_geomean": 0.5862229251317956,
+          "mean_reward": 0.1875
+        },
+        "l1_fused_add_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 4,
+          "pass@1": 0.5,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 4,
+            "compile_error": 3,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": 1.4366611321755993,
+          "best_speedup_vs_eager": 1.448371809351444,
+          "speedup_vs_compile_geomean": 0.9640063539292543,
+          "mean_reward": 0.24147596690194456
+        },
+        "l1_gelu": {
+          "level": 1,
+          "n": 8,
+          "correct": 5,
+          "pass@1": 0.625,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 5,
+            "compile_error": 2,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": 0.14439017402653997,
+          "best_speedup_vs_eager": 0.9672073810961169,
+          "speedup_vs_compile_geomean": 0.14491980202793736,
+          "mean_reward": 0.1875
+        },
+        "l1_mul": {
+          "level": 1,
+          "n": 8,
+          "correct": 6,
+          "pass@1": 0.75,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 6,
+            "incorrect": 2
+          },
+          "speedup_vs_eager_geomean": 0.42065949685246573,
+          "best_speedup_vs_eager": 0.9734000357569584,
+          "speedup_vs_compile_geomean": 0.4195160771229176,
+          "mean_reward": 0.22499999999999998
+        },
+        "l1_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 7,
+          "pass@1": 0.875,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 1,
+            "correct": 7
+          },
+          "speedup_vs_eager_geomean": 0.2526181827901784,
+          "best_speedup_vs_eager": 1.0192312426633288,
+          "speedup_vs_compile_geomean": 0.2548006235436828,
+          "mean_reward": 0.2637023115367204
+        },
+        "l1_row_max": {
+          "level": 1,
+          "n": 8,
+          "correct": 2,
+          "pass@1": 0.25,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 2,
+            "compile_error": 4,
+            "correct": 2
+          },
+          "speedup_vs_eager_geomean": 0.39494295167933824,
+          "best_speedup_vs_eager": 1.2363179876411121,
+          "speedup_vs_compile_geomean": 0.30343371696096344,
+          "mean_reward": 0.08838968137066883
+        },
+        "l1_row_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 4,
+          "pass@1": 0.5,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 4,
+            "incorrect": 1,
+            "compile_error": 3
+          },
+          "speedup_vs_eager_geomean": 1.212082585594308,
+          "best_speedup_vs_eager": 1.2199174121013108,
+          "speedup_vs_compile_geomean": 0.9229912357392197,
+          "mean_reward": 0.19856040010497317
+        },
+        "l1_scalar_affine": {
+          "level": 1,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "compile_error": 3,
+            "correct": 3,
+            "incorrect": 2
+          },
+          "speedup_vs_eager_geomean": 0.06676900891465867,
+          "best_speedup_vs_eager": 1.6243665640924674,
+          "speedup_vs_compile_geomean": 0.04031502266011075,
+          "mean_reward": 0.14311962908784448
+        },
+        "l1_silu": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "compile_error": 5,
+            "incorrect": 1,
+            "crash": 1,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 0.005538450126571962,
+          "best_speedup_vs_eager": 0.005538450126571962,
+          "speedup_vs_compile_geomean": 0.005468285202346787,
+          "mean_reward": 0.0375
+        },
+        "l1_vector_add": {
+          "level": 1,
+          "n": 8,
+          "correct": 2,
+          "pass@1": 0.25,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 4,
+            "correct": 2,
+            "compile_error": 2
+          },
+          "speedup_vs_eager_geomean": 0.9788873481629805,
+          "best_speedup_vs_eager": 0.980068509108745,
+          "speedup_vs_compile_geomean": 0.9828520707136208,
+          "mean_reward": 0.075
+        },
+        "l2_bias_gelu": {
+          "level": 2,
+          "n": 8,
+          "correct": 2,
+          "pass@1": 0.25,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 2,
+            "compile_error": 5,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 4.735208439453509,
+          "best_speedup_vs_eager": 4.738330811275168,
+          "speedup_vs_compile_geomean": 1.0132686814220644,
+          "mean_reward": 0.25
+        },
+        "l2_cross_entropy": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 6,
+            "incorrect": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_cumsum": {
+          "level": 2,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "compile_error": 5,
+            "static_reject": 1,
+            "incorrect": 1,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 0.3467777733171359,
+          "best_speedup_vs_eager": 0.3467777733171359,
+          "speedup_vs_compile_geomean": 0.10136969582730086,
+          "mean_reward": 0.0375
+        },
+        "l2_layernorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 6,
+            "incorrect": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_log_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 7,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_logsumexp": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_mean_center": {
+          "level": 2,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 3,
+            "compile_error": 4,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": 1.5059495757549366,
+          "best_speedup_vs_eager": 1.643116143502532,
+          "speedup_vs_compile_geomean": 0.8037049656871027,
+          "mean_reward": 0.19002589222186828
+        },
+        "l2_residual_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 4,
+            "incorrect": 2,
+            "hack_detected": 1,
+            "static_reject": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 1,
+            "compile_error": 6,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_row_l2norm": {
+          "level": 2,
+          "n": 8,
+          "correct": 3,
+          "pass@1": 0.375,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 3,
+            "compile_error": 3,
+            "incorrect": 2
+          },
+          "speedup_vs_eager_geomean": 1.797236170167211,
+          "best_speedup_vs_eager": 1.8028744105072319,
+          "speedup_vs_compile_geomean": 0.8817569427563438,
+          "mean_reward": 0.22350862528053955
+        },
+        "l2_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 4,
+            "compile_error": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_swiglu": {
+          "level": 2,
+          "n": 8,
+          "correct": 4,
+          "pass@1": 0.5,
+          "pass@8": 1.0,
+          "statuses": {
+            "correct": 4,
+            "compile_error": 3,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": 1.3210158197768416,
+          "best_speedup_vs_eager": 4.5410480535942686,
+          "speedup_vs_compile_geomean": 0.2802720488555827,
+          "mean_reward": 0.4125
+        },
+        "l3_attention": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 2,
+            "compile_error": 6
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_attention_causal": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 6,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_batched_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 4,
+            "crash": 3,
+            "static_reject": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 6,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_bias_relu": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 6,
+            "static_reject": 1,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_scale_residual": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 4,
+            "static_reject": 2,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        }
+      }
+    },
+    "two_turn": {
+      "n_pairs": 240,
+      "turn1_correct_rate": 0.22083333333333333,
+      "turn2_correct_rate": 0.24166666666666667,
+      "correct_in_either_rate": 0.32083333333333336,
+      "transitions": {
+        "compile_error->compile_error": 88,
+        "correct->correct": 34,
+        "crash->compile_error": 14,
+        "compile_error->incorrect": 13,
+        "correct->incorrect": 12,
+        "compile_error->correct": 12,
+        "incorrect->correct": 10,
+        "crash->crash": 9,
+        "incorrect->compile_error": 9,
+        "incorrect->incorrect": 8,
+        "correct->compile_error": 7,
+        "compile_error->crash": 6,
+        "static_reject->static_reject": 4,
+        "crash->incorrect": 3,
+        "static_reject->compile_error": 2,
+        "crash->correct": 2,
+        "static_reject->crash": 2,
+        "crash->static_reject": 1,
+        "compile_error->hack_detected": 1,
+        "compile_error->static_reject": 1,
+        "incorrect->crash": 1,
+        "hack_detected->compile_error": 1
+      },
+      "speedup_ratio_t2_over_t1_geomean": 0.9290505065470775,
+      "n_correct_both": 34
+    }
+  }
+}

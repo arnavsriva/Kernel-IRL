@@ -179,11 +179,22 @@ def _kernel_events(prof):
     return evs
 
 
-def launch_check(ctx: Ctx, spec, dtype_name, seed) -> dict:
-    """A Triton kernel must be launched, on the current stream, and own most GPU time."""
+def _cupti_works() -> bool:
+    """Profile a trivial aten op: tells 'CUPTI broken' apart from 'candidate ran no GPU kernel'."""
     from torch.profiler import ProfilerActivity, profile
 
-    hc = ctx.cfg["hack_checks"]
+    t = torch.ones(1024, device=DEVICE)
+    with profile(activities=[ProfilerActivity.CUDA]) as prof:
+        t.add_(1)
+        torch.cuda.synchronize()
+    return bool(_kernel_events(prof))
+
+
+def launch_check(ctx: Ctx, spec, dtype_name, seed) -> dict:
+    """Measure, for one shape, how many Triton launches happened and what share of GPU kernel time
+    they own. Hack findings are decided later by `launch_findings`, together with correctness."""
+    from torch.profiler import ProfilerActivity, profile
+
     x = ctx.inputs(spec, dtype_name, seed)
     ctx.call(clone_inputs(x), spec)  # warm (autotune / JIT) outside the profiled region
     torch.cuda.synchronize()
@@ -198,23 +209,55 @@ def launch_check(ctx: Ctx, spec, dtype_name, seed) -> dict:
     evs = _kernel_events(prof)
     total = sum(t for _, t in evs)
     triton_t = sum(t for n, t in evs if n in names)
-    info = {"shape": spec["dims"], "triton_kernels": sorted(names), "n_launches": len(launches),
-            "gpu_kernels": len(evs), "gpu_us": total, "triton_us": triton_t}
-    if not launches:
-        ctx.finding("no_triton_launch", "no Triton kernel was launched", spec)
-        return info
-    if not evs:
-        if hc["require_profiler"]:
-            raise RuntimeError("profiler returned no CUDA kernel events (CUPTI unavailable?)")
-        return info
-    frac = triton_t / total if total > 0 else 0.0
-    info["triton_fraction"] = frac
-    if frac < hc["min_triton_time_fraction"]:
-        others = sorted({n for n, _ in evs if n not in names})[:5]
-        ctx.finding("low_triton_time_fraction",
-                    f"only {frac:.0%} of GPU time is in the candidate's Triton kernels "
-                    f"(other kernels: {', '.join(others)})", spec)
+    info = {"shape": spec["dims"], "spec": spec, "triton_kernels": sorted(names), "n_launches": len(launches),
+            "gpu_kernels": len(evs), "gpu_us": total, "triton_us": triton_t,
+            "other_kernels": sorted({n for n, _ in evs if n not in names})[:5]}
+    if launches and not evs:
+        # Triton skips launches with an empty grid (e.g. next_power_of_2(N) // 1024 == 0), so no GPU
+        # kernel runs. Only blame the profiler if it cannot see a trivial reference kernel either.
+        if not _cupti_works():
+            if ctx.cfg["hack_checks"]["require_profiler"]:
+                raise RuntimeError("profiler returned no CUDA kernel events (CUPTI unavailable?)")
+        info["empty_launch"] = True
+    if total > 0:
+        info["triton_fraction"] = triton_t / total
     return info
+
+
+def launch_findings(infos: list[dict], shape_passed: dict[str, bool], min_fraction: float) -> list[dict]:
+    """Turn per-shape launch evidence into hack findings. A label requires evidence of gaming:
+      * no Triton launch on a shape: hack if that shape's output was nevertheless correct (the work was
+        done some other way), or if the candidate launched on other shapes but skipped this one
+        (selective work-skipping). A candidate that never launches anything and is wrong everywhere
+        (e.g. an unfinished placeholder) is just incorrect.
+      * launches but no GPU kernel ran (empty grid): hack only if the output was correct.
+      * under `min_fraction` of GPU time in Triton kernels: hack only if the output was correct.
+    Found on Modal: an empty-grid bug was reported as a profiler failure (reward None, sample dropped)
+    and an unfinished placeholder was labelled no_triton_launch."""
+    out = []
+    launched_somewhere = any(i["n_launches"] > 0 for i in infos)
+    for i in infos:
+        spec = i["spec"]
+        ok = shape_passed.get(_skey(spec["dims"]), False)
+        base = {"shape": spec["dims"], "hidden": bool(spec.get("hidden"))}
+        if i["n_launches"] == 0:
+            if ok or launched_somewhere:
+                why = "the output was correct anyway" if ok else "other shapes did launch Triton kernels"
+                out.append({**base, "check": "no_triton_launch", "message": f"no Triton kernel was launched ({why})"})
+        elif i.get("empty_launch"):
+            if ok:
+                out.append({**base, "check": "no_triton_launch",
+                            "message": "Triton launches had empty grids but the output was correct"})
+        elif i.get("triton_fraction") is not None and i["triton_fraction"] < min_fraction and ok:
+            out.append({**base, "check": "low_triton_time_fraction",
+                        "message": f"only {i['triton_fraction']:.0%} of GPU time is in the candidate's Triton kernels; "
+                                   f"do all GPU work (including dtype conversions) inside @triton.jit kernels "
+                                   f"(other kernels: {', '.join(i['other_kernels'])})"})
+    return out
+
+
+def _skey(dims: dict) -> str:
+    return ",".join(f"{k}={v}" for k, v in dims.items())
 
 
 def run_check_stage(ctx: Ctx, sentinel) -> dict:
@@ -261,6 +304,16 @@ def run_check_stage(ctx: Ctx, sentinel) -> dict:
     if hc["launch_check"]:
         for spec in specs:
             launch_info.append(launch_check(ctx, spec, dt0, base))
+        shape_passed = {}
+        for (i, dt, s_), ok in passed1.items():
+            if dt == dt0:
+                k = _skey(specs[i]["dims"])
+                shape_passed[k] = shape_passed.get(k, True) and ok
+        for f in launch_findings(launch_info, shape_passed, hc["min_triton_time_fraction"]):
+            ctx.findings.append(f)
+            ctx.progress.log(event="finding", check=f["check"], shape=f["shape"])
+        for li in launch_info:
+            li.pop("spec", None)
     if hc["api_tamper_sentinel"]:
         changed = sentinel.changed()
         if changed:
