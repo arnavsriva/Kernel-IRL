@@ -34,7 +34,7 @@ for step in $STEPS; do
     probe) $PY scripts/gpu_probe.py --out docs/results/gpu_probe.json ;;
     diagnose) FIXTURES="$FIXTURES" $PY scripts/diagnose_fixture.py 2>&1 | tee docs/results/diagnose_fixture.log ;;
     validate) $PY -m kernelrl.tasks.validate --device cuda ;;
-    verdicts) $PY -m pytest -v -rs --durations=15 ${PYTEST_ARGS:-tests/} 2>&1 | tee docs/results/verdicts_pytest.log ;;  # pipefail propagates pytest failures   # includes tests/gpu
+    verdicts) $PY -m pytest -v -rs --durations=15 ${PYTEST_ARGS:-tests/} 2>&1 | tee "docs/results/verdicts_pytest${PYTEST_ARGS:+_targeted}.log" ;;  # pipefail propagates pytest failures   # includes tests/gpu
     eval)
       start_server on 30000
       $PY -m kernelrl.eval.run_eval --run-id "$RUN_ID" --server-url http://127.0.0.1:30000/v1 ${EVAL_ARGS:-}
