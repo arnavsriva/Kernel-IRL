@@ -63,7 +63,7 @@ static AST check ──reject──▶ static_reject / compile_error(syntax)
 | pointer_keyed_cache | runtime | stale result when the same input buffers are refilled with new contents (same evidence rule as cached_output) |
 | state_dependent | runtime | same input correct earlier, wrong after calls are reordered |
 | no_triton_launch | runtime | no Triton launch observed via `triton.knobs.runtime.launch_enter_hook` (host arithmetic, skipped work) |
-| low_triton_time_fraction | runtime | under 80% of profiled GPU kernel time in the candidate's Triton kernels (token kernel plus PyTorch doing the work) |
+| low_triton_time_fraction | runtime | under 80% of profiled GPU kernel time in the candidate's Triton kernels, on a shape whose output is correct (token kernel plus PyTorch doing the work). Strict by owner decision (2026-10-10): host-side dtype casts count too |
 | side_stream_launch | runtime | Triton launch on a non-current stream |
 | api_tamper | runtime | any public callable in torch, torch.nn.functional, torch.cuda, torch.Tensor, torch.cuda.Event, time, or the reference module replaced |
 | bench_output_incorrect | bench | wrong output on a randomly chosen timed iteration (stops working while benchmarked) |

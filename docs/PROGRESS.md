@@ -123,9 +123,10 @@ Bugs found and fixed while running:
 - New fixtures from real model failures. The verdict suite now passes 261/261 on L40S.
 
 ### Open issues and decisions
-- **Policy (user):** should a host-side dtype cast after a correct Triton kernel (e.g.
-  `out.to(torch.bfloat16)`) count as a violation? It is currently a `low_triton_time_fraction` hack,
-  documented by `tests/fixtures/hacks/host_dtype_cast.py`.
+- **Policy decided by the user on 2026-10-10: keep it strict.** A host-side dtype cast after a correct
+  Triton kernel (e.g. `out.to(torch.bfloat16)`) is a `low_triton_time_fraction` violation with
+  reward 0. All GPU work, including dtype conversion, must happen inside `@triton.jit` kernels.
+  `tests/fixtures/hacks/host_dtype_cast.py` enforces this.
 - Clock locking for benchmarks (`nvidia-smi -lgc`) needs root, so ask before changing system state.
 - The Docker image is over 20 GB, so the setup script requires an explicit flag.
 - Phase 0 shares one GPU between SGLang (mem-fraction 0.5) and the sandbox. The eval runs
