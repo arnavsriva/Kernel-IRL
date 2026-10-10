@@ -63,3 +63,20 @@ def test_looks_computed_evidence_rule():
     assert not _looks_computed(torch.arange(4))           # non-float
     assert _looks_computed(torch.randn(64, 64))           # a real result
     assert _looks_computed(torch.randn(2).half())
+
+
+def test_reorder_failure_classification():
+    """state_dependent needs replay evidence; fresh garbage (OOB reads) is an honest bug."""
+    import torch
+
+    from kernelrl.sandbox.checks import classify_reorder_failure, fingerprint
+
+    a, b = torch.randn(1000), torch.randn(1000)
+    assert fingerprint(a) == fingerprint(a.clone()) and fingerprint(a) != fingerprint(b)
+    assert fingerprint(a) != fingerprint(a.flip(0))  # position-weighted, not just a sum
+    assert classify_reorder_failure(fingerprint(a), [fingerprint(b), fingerprint(a)]) == "replay"
+    garbage = torch.randn(1000)
+    assert classify_reorder_failure(fingerprint(garbage), [fingerprint(a), fingerprint(b)]) == "nondeterministic"
+    assert classify_reorder_failure(None, [fingerprint(a)]) == "nondeterministic"
+    nan = torch.full((4,), float("nan"))
+    assert fingerprint(nan) == fingerprint(nan.clone())

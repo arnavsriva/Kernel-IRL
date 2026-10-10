@@ -1,0 +1,84 @@
+# Baseline: qwen3-4b_v2_nothink_k8_t2
+
+Model `Qwen/Qwen3-4B` (thinking=False), k=8, turns=2, sampling {'temperature': 0.7, 'top_p': 0.8, 'top_k': 20, 'min_p': 0.0, 'presence_penalty': 1.5, 'max_tokens': 8192}. Server: {'version': '0.5.15.post1', 'model_path': 'Qwen/Qwen3-4B', 'revision': '1cfa9a7208912126459214e8b04321603b3df60c', 'disable_radix_cache': False, 'mem_fraction_static': 0.5, 'context_length': 32768, 'random_seed': 0, 'reasoning_parser': 'qwen3', 'enable_metrics': True, 'tp_size': 1, 'dtype': 'auto', 'max_running_requests': None}.
+
+## Pass rates (macro-average over tasks)
+
+| Turn | pass@1 | pass@k | L1 pass@1 | L2 pass@1 | L3 pass@1 | speedup vs eager (geomean, correct) | vs torch.compile | fast_1 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 0.8% | 6.7% | 2.1% | 0.0% | 0.0% | 1.3x | 1.01x | 0.8% |
+| 2 | 0.8% | 6.7% | 2.1% | 0.0% | 0.0% | 1.29x | 1x | 0.4% |
+
+## Status distribution
+
+| Turn | correct | incorrect | hack_detected | static_reject | compile_error | crash | timeout |
+|---|---|---|---|---|---|---|---|
+| 1 | 2 | 100 | 1 | 13 | 59 | 65 | 0 |
+| 2 | 2 | 98 | 1 | 8 | 79 | 52 | 0 |
+
+## Hack attempts and rule violations (turn 1)
+
+- Runtime hacks detected: 1 {'state_dependent': 1}
+- Static rule violations: 12
+- All static rejection reasons: {'forbidden_api': 11, 'missing_entrypoint': 1, 'forbidden_tensor_method': 1}
+- Extraction methods: {'fenced': 236, 'fenced_incomplete': 4}; finish reasons: {'stop': 239, 'length': 1}
+- Infrastructure errors (excluded from reward): 0
+
+## 1-turn vs 2-turn
+
+- Correct after turn 1: 0.8%; after one revision: 0.8%; correct in either turn: 0.8%
+- Speedup change for samples correct in both turns (geomean t2/t1): 0.989x over 2 samples
+
+| Transition (turn 1 -> turn 2) | count |
+|---|---|
+| incorrect->incorrect | 86 |
+| compile_error->compile_error | 56 |
+| crash->crash | 36 |
+| crash->compile_error | 19 |
+| incorrect->crash | 12 |
+| crash->incorrect | 9 |
+| static_reject->static_reject | 6 |
+| static_reject->crash | 4 |
+| static_reject->compile_error | 3 |
+| correct->correct | 2 |
+| compile_error->incorrect | 2 |
+| incorrect->hack_detected | 1 |
+| hack_detected->incorrect | 1 |
+| compile_error->static_reject | 1 |
+| incorrect->compile_error | 1 |
+| crash->static_reject | 1 |
+
+## Per task (turn 1)
+
+| Task | L | pass@1 | pass@8 | statuses | speedup vs eager | best | vs compile |
+|---|---|---|---|---|---|---|---|
+| l1_clamp | 1 | 0.0% | 0.0% | incorrect:8 | – | – | – |
+| l1_col_sum | 1 | 0.0% | 0.0% | compile_error:4, crash:4 | – | – | – |
+| l1_exp | 1 | 0.0% | 0.0% | incorrect:8 | – | – | – |
+| l1_fused_add_relu | 1 | 0.0% | 0.0% | crash:4, incorrect:4 | – | – | – |
+| l1_gelu | 1 | 0.0% | 0.0% | crash:2, incorrect:6 | – | – | – |
+| l1_mul | 1 | 0.0% | 0.0% | crash:7, incorrect:1 | – | – | – |
+| l1_relu | 1 | 12.5% | 100.0% | correct:1, crash:1, incorrect:6 | 1.01 | 1.01 | 1.03 |
+| l1_row_max | 1 | 0.0% | 0.0% | compile_error:3, crash:3, hack_detected:1, incorrect:1 | – | – | – |
+| l1_row_sum | 1 | 0.0% | 0.0% | crash:2, incorrect:6 | – | – | – |
+| l1_scalar_affine | 1 | 12.5% | 100.0% | correct:1, incorrect:7 | 1.68 | 1.68 | 1 |
+| l1_silu | 1 | 0.0% | 0.0% | incorrect:8 | – | – | – |
+| l1_vector_add | 1 | 0.0% | 0.0% | crash:5, incorrect:3 | – | – | – |
+| l2_bias_gelu | 2 | 0.0% | 0.0% | compile_error:1, crash:7 | – | – | – |
+| l2_cross_entropy | 2 | 0.0% | 0.0% | compile_error:5, crash:3 | – | – | – |
+| l2_cumsum | 2 | 0.0% | 0.0% | compile_error:7, incorrect:1 | – | – | – |
+| l2_layernorm | 2 | 0.0% | 0.0% | compile_error:4, crash:4 | – | – | – |
+| l2_log_softmax | 2 | 0.0% | 0.0% | compile_error:4, incorrect:4 | – | – | – |
+| l2_logsumexp | 2 | 0.0% | 0.0% | compile_error:5, incorrect:3 | – | – | – |
+| l2_mean_center | 2 | 0.0% | 0.0% | crash:1, incorrect:7 | – | – | – |
+| l2_residual_rmsnorm | 2 | 0.0% | 0.0% | compile_error:1, crash:1, incorrect:6 | – | – | – |
+| l2_rmsnorm | 2 | 0.0% | 0.0% | compile_error:8 | – | – | – |
+| l2_row_l2norm | 2 | 0.0% | 0.0% | compile_error:1, incorrect:7 | – | – | – |
+| l2_softmax | 2 | 0.0% | 0.0% | incorrect:8 | – | – | – |
+| l2_swiglu | 2 | 0.0% | 0.0% | compile_error:3, incorrect:5 | – | – | – |
+| l3_attention | 3 | 0.0% | 0.0% | compile_error:3, crash:5 | – | – | – |
+| l3_attention_causal | 3 | 0.0% | 0.0% | compile_error:1, crash:5, static_reject:2 | – | – | – |
+| l3_batched_matmul | 3 | 0.0% | 0.0% | compile_error:1, static_reject:7 | – | – | – |
+| l3_matmul | 3 | 0.0% | 0.0% | compile_error:3, crash:5 | – | – | – |
+| l3_matmul_bias_relu | 3 | 0.0% | 0.0% | compile_error:3, crash:1, static_reject:4 | – | – | – |
+| l3_matmul_scale_residual | 3 | 0.0% | 0.0% | compile_error:2, crash:5, incorrect:1 | – | – | – |

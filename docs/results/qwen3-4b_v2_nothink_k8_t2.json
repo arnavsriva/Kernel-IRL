@@ -1,0 +1,1192 @@
+{
+  "created_utc": "2026-10-10T15:55:36+00:00",
+  "env": {
+    "git": {
+      "commit": null,
+      "dirty": null
+    },
+    "python": "3.12.3",
+    "platform": "Linux-6.12.0-204.92.4.4.3.el9uek.x86_64-x86_64-with-glibc2.39",
+    "hostname": "modal",
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA H100 80GB HBM3",
+        "driver": "580.95.05",
+        "memory_mib": 81559,
+        "max_sm_clock_mhz": "1980",
+        "uuid": "GPU-f56f99b0-6f35-8cbf-e165-ee37c2a0ef4f",
+        "driver_cuda_version": "13.0"
+      }
+    ],
+    "libs": {
+      "torch": "2.11.0+cu129",
+      "triton": "3.6.0",
+      "sglang": "0.5.15.post1",
+      "openai": "2.6.1",
+      "numpy": "2.4.4",
+      "ray": null,
+      "transformers": "5.12.1"
+    }
+  },
+  "run_id": "qwen3-4b_v2_nothink_k8_t2",
+  "model": "Qwen/Qwen3-4B",
+  "k": 8,
+  "turns": 2,
+  "thinking": false,
+  "prompt": "v2",
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "min_p": 0.0,
+    "presence_penalty": 1.5,
+    "max_tokens": 8192
+  },
+  "seed": 0,
+  "tasks": [
+    "l1_clamp",
+    "l1_col_sum",
+    "l1_exp",
+    "l1_fused_add_relu",
+    "l1_gelu",
+    "l1_mul",
+    "l1_relu",
+    "l1_row_max",
+    "l1_row_sum",
+    "l1_scalar_affine",
+    "l1_silu",
+    "l1_vector_add",
+    "l2_bias_gelu",
+    "l2_cross_entropy",
+    "l2_cumsum",
+    "l2_layernorm",
+    "l2_log_softmax",
+    "l2_logsumexp",
+    "l2_mean_center",
+    "l2_residual_rmsnorm",
+    "l2_rmsnorm",
+    "l2_row_l2norm",
+    "l2_softmax",
+    "l2_swiglu",
+    "l3_attention",
+    "l3_attention_causal",
+    "l3_batched_matmul",
+    "l3_matmul",
+    "l3_matmul_bias_relu",
+    "l3_matmul_scale_residual"
+  ],
+  "server": {
+    "version": "0.5.15.post1",
+    "model_path": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "disable_radix_cache": false,
+    "mem_fraction_static": 0.5,
+    "context_length": 32768,
+    "random_seed": 0,
+    "reasoning_parser": "qwen3",
+    "enable_metrics": true,
+    "tp_size": 1,
+    "dtype": "auto",
+    "max_running_requests": null
+  },
+  "sandbox_config": {
+    "methodology_version": 1,
+    "timeouts_s": {
+      "compile": 180,
+      "check": 180,
+      "bench": 240,
+      "baseline": 900,
+      "probe": 60
+    },
+    "limits": {
+      "host_rss_gb": 24,
+      "max_file_bytes": 268435456,
+      "max_source_bytes": 65536,
+      "watchdog_interval_s": 0.05
+    },
+    "correctness": {
+      "num_seeds": 2,
+      "fixed_seeds": null,
+      "poison_allocator": true
+    },
+    "hack_checks": {
+      "distinct_inputs": true,
+      "mutation_after_call": true,
+      "same_address_reuse": true,
+      "call_order_permutation": true,
+      "launch_check": true,
+      "min_triton_time_fraction": 0.8,
+      "require_profiler": true,
+      "api_tamper_sentinel": true
+    },
+    "benchmark": {
+      "warmup": 25,
+      "iters": 100,
+      "l2_flush_bytes": 268435456,
+      "input_variants": 2,
+      "verify_iters": 4,
+      "bench_seed": 1234,
+      "inproc_reference_ratio_limit": 2.0,
+      "wall_over_event_limit": 3.0,
+      "wall_over_event_min_ms": 0.1,
+      "wall_iters": 20,
+      "compile_mode": "default"
+    },
+    "feedback": {
+      "max_error_chars": 1500,
+      "include_profiler": false,
+      "max_shapes_listed": 6
+    },
+    "probe_after_failure": true,
+    "child_env_passthrough": [
+      "PATH",
+      "LD_LIBRARY_PATH",
+      "CUDA_HOME",
+      "HOME",
+      "LANG",
+      "LC_ALL",
+      "TRITON_PTXAS_PATH",
+      "NVIDIA_VISIBLE_DEVICES"
+    ]
+  },
+  "summary": {
+    "k": 8,
+    "turn1": {
+      "n_samples": 240,
+      "pass@1": 0.008333333333333333,
+      "pass@8": 0.06666666666666667,
+      "by_level": {
+        "1": {
+          "pass@1": 0.020833333333333332,
+          "pass@8": 0.16666666666666666
+        },
+        "2": {
+          "pass@1": 0.0,
+          "pass@8": 0.0
+        },
+        "3": {
+          "pass@1": 0.0,
+          "pass@8": 0.0
+        }
+      },
+      "status_counts": {
+        "correct": 2,
+        "incorrect": 100,
+        "hack_detected": 1,
+        "static_reject": 13,
+        "compile_error": 59,
+        "crash": 65,
+        "timeout": 0
+      },
+      "static_reject_reasons": {
+        "forbidden_api": 11,
+        "missing_entrypoint": 1,
+        "forbidden_tensor_method": 1
+      },
+      "hack_reasons": {
+        "state_dependent": 1
+      },
+      "hack_detected": 1,
+      "static_rule_violations": 12,
+      "speedup_vs_eager_geomean_correct": 1.3031322970881,
+      "speedup_vs_eager_median_correct": 1.3447924716913078,
+      "speedup_vs_compile_geomean_correct": 1.0125854578132363,
+      "fast_1_frac": 0.008333333333333333,
+      "extraction_methods": {
+        "fenced": 236,
+        "fenced_incomplete": 4
+      },
+      "finish_reasons": {
+        "stop": 239,
+        "length": 1
+      },
+      "infra_errors": 0,
+      "per_task": {
+        "l1_clamp": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_col_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 4,
+            "compile_error": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_exp": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_fused_add_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 4,
+            "incorrect": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_gelu": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 6,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_mul": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 7,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "crash": 1,
+            "incorrect": 6,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 1.0126584502428737,
+          "best_speedup_vs_eager": 1.0126584502428737,
+          "speedup_vs_compile_geomean": 1.0250148025981358,
+          "mean_reward": 0.03829396028020146
+        },
+        "l1_row_max": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 1,
+            "compile_error": 3,
+            "crash": 3,
+            "hack_detected": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_row_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 6,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_scalar_affine": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 7,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 1.6769264931397418,
+          "best_speedup_vs_eager": 1.6769264931397418,
+          "speedup_vs_compile_geomean": 1.0003068314485881,
+          "mean_reward": 0.07012960097225186
+        },
+        "l1_silu": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_vector_add": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 3,
+            "crash": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_bias_gelu": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 7,
+            "compile_error": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_cross_entropy": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 3,
+            "compile_error": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_cumsum": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 7,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_layernorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 4,
+            "crash": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_log_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 4,
+            "compile_error": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_logsumexp": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 5,
+            "incorrect": 3
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_mean_center": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 7,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_residual_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 6,
+            "crash": 1,
+            "compile_error": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_row_l2norm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 1,
+            "incorrect": 7
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_swiglu": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 3,
+            "incorrect": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_attention": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 5,
+            "compile_error": 3
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_attention_causal": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 5,
+            "compile_error": 1,
+            "static_reject": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_batched_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "static_reject": 7,
+            "compile_error": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 3,
+            "crash": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_bias_relu": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 3,
+            "static_reject": 4,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_scale_residual": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 1,
+            "crash": 5,
+            "compile_error": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        }
+      }
+    },
+    "turn2": {
+      "n_samples": 240,
+      "pass@1": 0.008333333333333333,
+      "pass@8": 0.06666666666666667,
+      "by_level": {
+        "1": {
+          "pass@1": 0.020833333333333332,
+          "pass@8": 0.16666666666666666
+        },
+        "2": {
+          "pass@1": 0.0,
+          "pass@8": 0.0
+        },
+        "3": {
+          "pass@1": 0.0,
+          "pass@8": 0.0
+        }
+      },
+      "status_counts": {
+        "correct": 2,
+        "incorrect": 98,
+        "hack_detected": 1,
+        "static_reject": 8,
+        "compile_error": 79,
+        "crash": 52,
+        "timeout": 0
+      },
+      "static_reject_reasons": {
+        "forbidden_api": 5,
+        "missing_entrypoint": 3
+      },
+      "hack_reasons": {
+        "state_dependent": 1
+      },
+      "hack_detected": 1,
+      "static_rule_violations": 5,
+      "speedup_vs_eager_geomean_correct": 1.2884532268674393,
+      "speedup_vs_eager_median_correct": 1.3342522116111621,
+      "speedup_vs_compile_geomean_correct": 1.0036759904473973,
+      "fast_1_frac": 0.004166666666666667,
+      "extraction_methods": {
+        "fenced": 234,
+        "fenced_incomplete": 6
+      },
+      "finish_reasons": {
+        "stop": 237,
+        "length": 3
+      },
+      "infra_errors": 2,
+      "per_task": {
+        "l1_clamp": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 3,
+            "crash": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_col_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 4,
+            "compile_error": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_exp": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_fused_add_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 6,
+            "incorrect": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_gelu": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 7,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_mul": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 7,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_relu": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "crash": 1,
+            "incorrect": 6,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 0.9876728608642371,
+          "best_speedup_vs_eager": 0.9876728608642371,
+          "speedup_vs_compile_geomean": 0.9976162989191889,
+          "mean_reward": 0.0375
+        },
+        "l1_row_max": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "hack_detected": 1,
+            "compile_error": 3,
+            "crash": 3,
+            "incorrect": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_row_sum": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "crash": 3,
+            "incorrect": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_scalar_affine": {
+          "level": 1,
+          "n": 8,
+          "correct": 1,
+          "pass@1": 0.125,
+          "pass@8": 1.0,
+          "statuses": {
+            "incorrect": 7,
+            "correct": 1
+          },
+          "speedup_vs_eager_geomean": 1.6808315623580872,
+          "best_speedup_vs_eager": 1.6808315623580872,
+          "speedup_vs_compile_geomean": 1.0097724895753382,
+          "mean_reward": 0.07027641316471006
+        },
+        "l1_silu": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 7,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l1_vector_add": {
+          "level": 1,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 3,
+            "crash": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_bias_gelu": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 1,
+            "incorrect": 5,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_cross_entropy": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_cumsum": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 7,
+            "static_reject": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_layernorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 6,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_log_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 4,
+            "compile_error": 4
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_logsumexp": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 5,
+            "incorrect": 3
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_mean_center": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_residual_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 6,
+            "compile_error": 1,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_rmsnorm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_row_l2norm": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_softmax": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 8
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_swiglu": {
+          "level": 2,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 3,
+            "incorrect": 5
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_attention": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 7,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_attention_causal": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 6,
+            "crash": 1,
+            "static_reject": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_batched_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "static_reject": 5,
+            "crash": 2,
+            "compile_error": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 5,
+            "crash": 2,
+            "static_reject": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_bias_relu": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "compile_error": 5,
+            "crash": 3
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l3_matmul_scale_residual": {
+          "level": 3,
+          "n": 8,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@8": 0.0,
+          "statuses": {
+            "incorrect": 1,
+            "compile_error": 5,
+            "crash": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        }
+      }
+    },
+    "two_turn": {
+      "n_pairs": 240,
+      "turn1_correct_rate": 0.008333333333333333,
+      "turn2_correct_rate": 0.008333333333333333,
+      "correct_in_either_rate": 0.008333333333333333,
+      "transitions": {
+        "incorrect->incorrect": 86,
+        "compile_error->compile_error": 56,
+        "crash->crash": 36,
+        "crash->compile_error": 19,
+        "incorrect->crash": 12,
+        "crash->incorrect": 9,
+        "static_reject->static_reject": 6,
+        "static_reject->crash": 4,
+        "static_reject->compile_error": 3,
+        "correct->correct": 2,
+        "compile_error->incorrect": 2,
+        "incorrect->hack_detected": 1,
+        "hack_detected->incorrect": 1,
+        "compile_error->static_reject": 1,
+        "incorrect->compile_error": 1,
+        "crash->static_reject": 1
+      },
+      "speedup_ratio_t2_over_t1_geomean": 0.9887355487593535,
+      "n_correct_both": 2
+    }
+  }
+}

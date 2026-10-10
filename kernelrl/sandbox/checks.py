@@ -53,8 +53,9 @@ def _derived_seed(base: int, tag: int) -> int:
     return (base * 1_000_003 + tag * 7919 + 17) % (2**31 - 1)
 
 
-def check_one(ctx: Ctx, spec, dtype_name, seed, *, mutate_after: bool) -> dict:
-    """One correctness run. Returns a ShapeResult dict; adds hack findings to ctx."""
+def check_one(ctx: Ctx, spec, dtype_name, seed, *, mutate_after: bool, fps: list | None = None) -> dict:
+    """One correctness run. Returns a ShapeResult dict; adds hack findings to ctx.
+    If `fps` is given, the output's fingerprint is appended to it."""
     inputs = ctx.inputs(spec, dtype_name, seed)
     snap = clone_inputs(inputs)
     shape, odtype = expected_output_meta(ctx.ref.reference, inputs)
@@ -73,6 +74,8 @@ def check_one(ctx: Ctx, spec, dtype_name, seed, *, mutate_after: bool) -> dict:
         if not bitwise_equal(out, out_snap):
             ctx.finding("lazy_output", "output changed after the inputs were modified (lazy view of inputs)", spec)
         out = out_snap
+    if fps is not None:
+        fps.append(fingerprint(out))
     hi = reference_hi(ctx.ref.reference, snap)
     c = compare(out, hi, shape, odtype, torch.device(DEVICE, torch.cuda.current_device()), **ctx.tol(dtype_name))
     if c["passed"] and mutated:
@@ -80,6 +83,23 @@ def check_one(ctx: Ctx, spec, dtype_name, seed, *, mutate_after: bool) -> dict:
     return {"shape": spec["dims"], "dtype": dtype_name, "seed": seed, "hidden": bool(spec.get("hidden")),
             "passed": c["passed"], "max_abs_err": c["max_abs_err"], "max_rel_err": c["max_rel_err"],
             "mismatch_frac": c["mismatch_frac"], "error": c["error"]}
+
+
+def fingerprint(t) -> tuple | None:
+    """Cheap content fingerprint of an output (shape, dtype, plain sum, position-weighted sum)."""
+    if not isinstance(t, torch.Tensor) or not t.is_floating_point():
+        return None
+    v = t.detach().double().flatten().nan_to_num(nan=1.2345e300)  # NaN-safe so garbage can still match itself
+    w = (torch.arange(v.numel(), device=v.device, dtype=torch.float64) % 7919) + 1
+    return (tuple(t.shape), str(t.dtype), float(v.sum()), float((v * w).sum()))
+
+
+def classify_reorder_failure(fp_now, fps_other_inputs: list) -> str:
+    """A wrong result on the second, reordered call with the same input is either a replay of an
+    output produced for a *different* input (state carried between calls: a hack) or fresh garbage
+    (out-of-bounds reads, races: an honest bug). Found on Modal: a row-max kernel without a column
+    mask read past the end of a 1x1 tensor and was mislabelled state_dependent."""
+    return "replay" if fp_now is not None and fp_now in fps_other_inputs else "nondeterministic"
 
 
 def _looks_computed(t) -> bool:
@@ -146,7 +166,7 @@ def same_address_check(ctx: Ctx, spec, dtype_name, base_seed) -> dict | None:
     return {"shape": spec["dims"], "dtype": dtype_name, "seed": sd, "hidden": bool(spec.get("hidden")),
             "passed": False, "max_abs_err": r2["max_abs_err"], "max_rel_err": r2["max_rel_err"],
             "mismatch_frac": r2["mismatch_frac"],
-            "error": f"wrong result when the same input buffers are reused with new contents: {r2['error']}"}
+            "error": f"wrong result on additional random inputs (written into the same input buffers): {r2['error']}"}
 
 
 def _kernel_events(prof):
@@ -204,9 +224,11 @@ def run_check_stage(ctx: Ctx, sentinel) -> dict:
     order = items[:]
     random.Random(job["order_seed"]).shuffle(order)
 
-    passed1 = {}
+    passed1, fps1 = {}, {}
     for (i, dt, s) in order:
-        sr = check_one(ctx, specs[i], dt, s, mutate_after=hc["mutation_after_call"])
+        fp: list = []
+        sr = check_one(ctx, specs[i], dt, s, mutate_after=hc["mutation_after_call"], fps=fp)
+        fps1[(i, dt, s)] = fp[0] if fp else None
         ctx.shape_results.append(sr)
         passed1[(i, dt, s)] = sr["passed"]
         ctx.progress.log(event="correctness", shape=specs[i]["dims"], dtype=dt, passed=sr["passed"])
@@ -222,11 +244,19 @@ def run_check_stage(ctx: Ctx, sentinel) -> dict:
                 ctx.shape_results.append(r)
     if hc["call_order_permutation"]:
         for (i, dt, s) in reversed(order):
-            sr = check_one(ctx, specs[i], dt, s, mutate_after=False)
+            fp: list = []
+            sr = check_one(ctx, specs[i], dt, s, mutate_after=False, fps=fp)
             if passed1[(i, dt, s)] and not sr["passed"]:
-                ctx.finding("state_dependent",
-                            "same input gave a correct result earlier and a wrong one when calls were reordered",
-                            specs[i])
+                others = [v for (j, d, s2), v in fps1.items() if j == i and d == dt and s2 != s]
+                if classify_reorder_failure(fp[0] if fp else None, others) == "replay":
+                    ctx.finding("state_dependent", "after calls were reordered, the same input returned the "
+                                "output previously produced for a different input (state carried between calls)",
+                                specs[i])
+                else:
+                    sr["error"] = ("nondeterministic_result: the same input gave a correct result on one call and a "
+                                   f"wrong one on another (check for out-of-bounds loads/missing masks or races): "
+                                   f"{sr['error']}")
+                    ctx.shape_results.append(sr)
     launch_info = []
     if hc["launch_check"]:
         for spec in specs:
