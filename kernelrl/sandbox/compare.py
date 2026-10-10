@@ -51,7 +51,10 @@ def compare(out, ref_hi, expected_shape, expected_dtype, expected_device, atol: 
     if bool(bad_nonfinite.any()):
         n = int(bad_nonfinite.sum())
         has_nan = bool(torch.isnan(o).any())
-        res["error"] = f"{'nan' if has_nan else 'inf'}_in_output: {n} non-finite values where reference is finite"
+        hint = (" (output memory starts as NaN, so this usually means your kernel never wrote these elements:"
+                " check the launch grid covers every element and the store mask)") if has_nan else ""
+        res["error"] = (f"{'nan' if has_nan else 'inf'}_in_output: {n} of {o.numel()} values are non-finite where the "
+                        f"reference is finite{hint}")
         res["mismatch_frac"] = n / max(1, o.numel())
         return res
     if o.numel() == 0:
