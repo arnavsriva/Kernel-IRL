@@ -18,7 +18,10 @@ CODE = ("import torch\nimport triton\nimport triton.language as tl\n\n\n@triton.
 
 @pytest.mark.parametrize("task", all_tasks(), ids=lambda t: t.id)
 def test_prompt_never_contains_hidden_shapes(task):
-    p = user_prompt(task)
+    from kernelrl.serving.prompt import TRITON_GUIDE
+
+    # The v2 guide is identical for every task, so numbers in it cannot reveal a task's hidden shapes.
+    p = user_prompt(task).replace(TRITON_GUIDE, "")
     tokens = set(re.findall(r"(?<![\w.])\d+(?![\w.])", p))
     leaked = {v for v in hidden_only_values(task) if str(v) in tokens}
     assert not leaked, f"hidden dims {leaked} appear in the prompt"
@@ -123,3 +126,27 @@ def test_summary_and_markdown(tmp_path):
     md = write_markdown(s, {"run_id": "t", "model": "m", "thinking": False, "turns": 2, "sampling": {}},
                         tmp_path / "r.md").read_text()
     assert "1-turn vs 2-turn" in md and "l2_softmax" in md
+
+
+@pytest.mark.parametrize("task", all_tasks(), ids=lambda t: t.id)
+def test_prompt_v1_never_contains_hidden_shapes(task):
+    p = user_prompt(task, "v1")
+    tokens = set(re.findall(r"(?<![\w.])\d+(?![\w.])", p))
+    assert not {v for v in hidden_only_values(task) if str(v) in tokens}
+    assert "Triton quick reference" not in p
+
+
+def test_prompt_v2_example_is_valid_and_not_a_task():
+    from kernelrl.sandbox.static_check import check_source
+    from kernelrl.serving.prompt import TRITON_GUIDE
+
+    p = user_prompt(load_task("l2_softmax"), "v2")
+    assert "Triton quick reference" in p
+    example = extract_code(TRITON_GUIDE).code
+    r = check_source(example, expected_arity=2)
+    assert r.ok, r  # the worked example must itself follow every rule we enforce
+    # the example operation must not be one of the tasks (no free solutions)
+    assert "row_scale" in example
+    assert all("row_scale" not in t.id and "per-row factor" not in t.description for t in all_tasks())
+    with pytest.raises(ValueError):
+        user_prompt(load_task("l1_relu"), "v3")

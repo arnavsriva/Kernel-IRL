@@ -100,6 +100,7 @@ def main(argv=None) -> int:
     ap.add_argument("--k", type=int, default=cfg["k"])
     ap.add_argument("--turns", type=int, choices=(1, 2), default=cfg["turns"])
     ap.add_argument("--thinking", action="store_true", default=cfg["thinking"])
+    ap.add_argument("--prompt", choices=("v1", "v2"), default=cfg["prompt"])
     ap.add_argument("--server-url", default=cfg["server_url"])
     ap.add_argument("--model", default=cfg["model"])
     ap.add_argument("--concurrency", type=int, default=cfg["concurrency"])
@@ -116,13 +117,14 @@ def main(argv=None) -> int:
     sandbox_cfg = load_config()
     gen = Generator(args.server_url, args.model, sampling, thinking=args.thinking, concurrency=args.concurrency)
     meta = {"run_id": args.run_id, "model": args.model, "k": args.k, "turns": args.turns, "thinking": args.thinking,
+            "prompt": args.prompt,
             "sampling": sampling, "seed": cfg["seed"], "tasks": [t.id for t in tasks],
             "server": server_info(args.server_url), "sandbox_config": sandbox_cfg}
     (run_dir / "meta.json").write_text(json.dumps(stamp(meta), indent=2, default=str))
 
     # ---- turn 1 ----
     reqs = [{"id": f"{t.id}:{i}:t1", "task": t.id, "sample": i, "turn": 1, "seed": cfg["seed"] + i,
-             "messages": initial_messages(t)} for t in tasks for i in range(args.k)]
+             "messages": initial_messages(t, args.prompt)} for t in tasks for i in range(args.k)]
     asyncio.run(generate(reqs, gen, run_dir / "turn1_samples.jsonl"))
     s1 = {k: v for k, v in _load_jsonl(run_dir / "turn1_samples.jsonl").items() if k in {r["id"] for r in reqs}}
     evaluate_samples(s1, run_dir / "turn1_results.jsonl", sandbox_cfg, args.sandbox_gpu, not args.no_bench)
@@ -134,7 +136,7 @@ def main(argv=None) -> int:
         reqs2 = []
         for sid, s in sorted(s1.items()):
             task = load_task(s["task"])
-            msgs = revision_messages(task, s["completion"]["content"], r1[sid]["feedback"])
+            msgs = revision_messages(task, s["completion"]["content"], r1[sid]["feedback"], args.prompt)
             reqs2.append({"id": sid.replace(":t1", ":t2"), "task": s["task"], "sample": s["sample"], "turn": 2,
                           "seed": s["seed"] + TURN2_SEED_OFFSET, "messages": msgs})
         asyncio.run(generate(reqs2, gen, run_dir / "turn2_samples.jsonl"))

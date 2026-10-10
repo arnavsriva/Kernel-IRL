@@ -43,7 +43,8 @@ class Generator:
                 try:
                     r = await self.client.chat.completions.create(
                         model=self.model, messages=messages, temperature=s["temperature"], top_p=s["top_p"],
-                        max_tokens=s["max_tokens"], seed=seed, extra_body=extra)
+                        max_tokens=s["max_tokens"], presence_penalty=s.get("presence_penalty", 0.0), seed=seed,
+                        extra_body=extra)
                     ch = r.choices[0]
                     u = r.usage
                     details = getattr(u, "prompt_tokens_details", None)

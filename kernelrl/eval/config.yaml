@@ -4,10 +4,11 @@ server_url: http://127.0.0.1:30000/v1
 k: 8
 turns: 2              # 1 = single turn; 2 = one revision with sandbox feedback
 thinking: false       # primary baseline is non-thinking; run once with --thinking for comparison
+prompt: v2            # v1 = zero-shot rules only; v2 = + Triton API cheat-sheet + one worked example
 seed: 0               # sample i of a task uses seed + i (turn 2 adds 100000)
 concurrency: 64
-sampling:             # Qwen3 model-card recommendations
-  non_thinking: {temperature: 0.7, top_p: 0.8, top_k: 20, min_p: 0.0, max_tokens: 8192}
-  thinking: {temperature: 0.6, top_p: 0.95, top_k: 20, min_p: 0.0, max_tokens: 24576}
+sampling:             # Qwen3 model-card recommendations; presence_penalty 1.5 per the card's advice for endless repetition
+  non_thinking: {temperature: 0.7, top_p: 0.8, top_k: 20, min_p: 0.0, presence_penalty: 1.5, max_tokens: 8192}
+  thinking: {temperature: 0.6, top_p: 0.95, top_k: 20, min_p: 0.0, presence_penalty: 1.5, max_tokens: 24576}
 sandbox_gpu: null     # CUDA_VISIBLE_DEVICES for sandbox children; null = inherit
 run_bench: true

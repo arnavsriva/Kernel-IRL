@@ -26,8 +26,10 @@ def _gpu_key(gpu_index: int = 0) -> dict:
     fp = fingerprint()
     gpus = fp["gpus"]
     g = next((x for x in gpus if x["index"] == gpu_index), gpus[0] if gpus else {})
-    return {"gpu": g.get("name"), "driver": g.get("driver"), "torch": fp["libs"]["torch"],
-            "triton": fp["libs"]["triton"]}
+    # uuid: speedups must compare timings from the same physical card, not just the same model
+    # (parallel cloud runs land on different H100s that share one cache volume).
+    return {"gpu": g.get("name"), "gpu_uuid": g.get("uuid"), "driver": g.get("driver"),
+            "torch": fp["libs"]["torch"], "triton": fp["libs"]["triton"]}
 
 
 def baseline_key(task: Task, dims: dict, dtype: str, cfg: dict, gpu_index: int = 0) -> str:
