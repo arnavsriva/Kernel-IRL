@@ -81,3 +81,67 @@ def test_real_generator_survives_two_event_loops_under_contention(tmp_path, monk
     assert run_eval.main(args) == 0
     lines = (tmp_path / "runs" / "c" / "turn2_samples.jsonl").read_text().splitlines()
     assert len(lines) == 12
+
+
+def test_generator_shrinks_budget_on_context_overflow(monkeypatch):
+    """Regression: the thinking baseline crashed at turn 2 when history + 24576-token budget > 32768."""
+    import asyncio
+
+    import httpx
+    import openai
+
+    from kernelrl.serving.client import Generator
+
+    calls = []
+
+    async def fake_create(**kw):
+        calls.append(kw["max_tokens"])
+        if kw["max_tokens"] > 32768 - 12656:  # server rejects anything that cannot fit
+            resp = httpx.Response(400, request=httpx.Request("POST", "http://x/v1/chat/completions"))
+            raise openai.BadRequestError(
+                "Error code: 400 - Requested token count exceeds the model's maximum context length of 32768 "
+                "tokens. You requested a total of 37232 tokens: 12656 tokens from the input messages and 24576 "
+                "tokens for the completion.", response=resp, body=None)
+
+        class U:
+            prompt_tokens, completion_tokens, prompt_tokens_details = 12656, 100, None
+
+        class M:
+            content, reasoning_content = "ok", None
+
+        class C:
+            message, finish_reason = M(), "length"
+
+        class R:
+            choices, usage = [C()], U()
+        return R()
+
+    async def go():
+        g = Generator("http://x/v1", "m", {"temperature": 0.6, "top_p": 0.95, "max_tokens": 24576}, thinking=True)
+        monkeypatch.setattr(g.client.chat.completions, "create", fake_create)
+        return await g.complete([{"role": "user", "content": "hi"}], seed=1)
+
+    c = asyncio.run(go())
+    assert c.error is None and c.content == "ok"
+    assert calls == [24576, 32768 - 12656 - 16]
+
+
+def test_generator_records_other_bad_requests(monkeypatch):
+    import asyncio
+
+    import httpx
+    import openai
+
+    from kernelrl.serving.client import Generator
+
+    async def fake_create(**kw):
+        resp = httpx.Response(400, request=httpx.Request("POST", "http://x/v1/chat/completions"))
+        raise openai.BadRequestError("Error code: 400 - invalid request", response=resp, body=None)
+
+    async def go():
+        g = Generator("http://x/v1", "m", {"temperature": 0.6, "top_p": 0.95, "max_tokens": 100}, thinking=False)
+        monkeypatch.setattr(g.client.chat.completions, "create", fake_create)
+        return await g.complete([{"role": "user", "content": "hi"}], seed=1)
+
+    c = asyncio.run(go())
+    assert c.content == "" and c.error.startswith("BadRequestError")

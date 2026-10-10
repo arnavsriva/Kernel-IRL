@@ -7,7 +7,12 @@ import time
 import urllib.request
 from dataclasses import asdict, dataclass
 
-from openai import APIConnectionError, APITimeoutError, AsyncOpenAI, InternalServerError
+import re
+
+from openai import APIConnectionError, APIStatusError, APITimeoutError, AsyncOpenAI, BadRequestError, InternalServerError
+
+_CTX_RE = re.compile(r"maximum context length of (\d+) tokens.*?(\d+) tokens from the input", re.S)
+MIN_COMPLETION_TOKENS = 512
 
 
 @dataclass
@@ -37,13 +42,14 @@ class Generator:
         s = self.sampling
         extra = {"top_k": s.get("top_k", 20), "min_p": s.get("min_p", 0.0), "separate_reasoning": True,
                  "chat_template_kwargs": {"enable_thinking": self.thinking}}
+        max_tokens = s["max_tokens"]
         async with self.sem:
-            for attempt in range(self.retries):
+            for attempt in range(self.retries + 1):
                 t0 = time.perf_counter()
                 try:
                     r = await self.client.chat.completions.create(
                         model=self.model, messages=messages, temperature=s["temperature"], top_p=s["top_p"],
-                        max_tokens=s["max_tokens"], presence_penalty=s.get("presence_penalty", 0.0), seed=seed,
+                        max_tokens=max_tokens, presence_penalty=s.get("presence_penalty", 0.0), seed=seed,
                         extra_body=extra)
                     ch = r.choices[0]
                     u = r.usage
@@ -55,11 +61,25 @@ class Generator:
                         completion_tokens=u.completion_tokens,
                         cached_tokens=getattr(details, "cached_tokens", None) if details else None,
                         latency_s=time.perf_counter() - t0)
+                except BadRequestError as e:
+                    # Long turn-2 histories can exceed the context window with the configured budget.
+                    # Shrink the completion budget to what fits instead of failing the whole run.
+                    m = _CTX_RE.search(str(e))
+                    if m and attempt < self.retries:
+                        fit = int(m.group(1)) - int(m.group(2)) - 16
+                        if fit >= MIN_COMPLETION_TOKENS and fit < max_tokens:
+                            max_tokens = fit
+                            continue
+                    return Completion("", None, None, 0, 0, None, time.perf_counter() - t0,
+                                      error=f"{type(e).__name__}: {str(e)[:500]}")
                 except (APIConnectionError, APITimeoutError, InternalServerError) as e:
-                    if attempt == self.retries - 1:
+                    if attempt >= self.retries - 1:
                         return Completion("", None, None, 0, 0, None, time.perf_counter() - t0,
                                           error=f"{type(e).__name__}: {e}")
                     await asyncio.sleep(2 ** attempt)
+                except APIStatusError as e:  # any other server-side rejection: record, don't crash the run
+                    return Completion("", None, None, 0, 0, None, time.perf_counter() - t0,
+                                      error=f"{type(e).__name__}: {str(e)[:500]}")
         raise AssertionError("unreachable")
 
 
