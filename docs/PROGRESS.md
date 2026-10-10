@@ -101,7 +101,31 @@ end to end in about 3 minutes.
   Options are a short API cheat-sheet plus one worked example in the prompt, thinking mode, and
   presence_penalty=1.5 for the repetition loops (the Qwen3 card recommends it).
 
+### Full baselines on Modal H100 (2026-10-10)
+The user chose to compare prompts. Summary is in `docs/results/baseline_phase0.md`; per-run reports
+are in `docs/results/qwen3-4b_*_k8_t2.{json,md}`.
+
+| Setup | pass@1 t1 / t2 | pass@8 | L1 / L2 / L3 pass@1 (t2) | speedup of correct kernels |
+|---|---|---|---|---|
+| v1 zero-shot, non-thinking | 0% / 0% | 0% | 0 / 0 / 0 | n/a |
+| v2 cheat-sheet, non-thinking | 0.8% / 0.8% | 6.7% | 2.1 / 0 / 0% | 1.3x (2 kernels) |
+| v2 cheat-sheet, thinking | 22.1% / 24.2% | 56.7% | 46.9 / 13.5 / 0% | 0.54-0.58x eager |
+
+Phase 2 should start from v2 + thinking. L3 has no signal yet; consider a curriculum.
+
+Bugs found and fixed while running:
+- eval client: the semaphore was shared across event loops (turn-2 crash), and context overflow on
+  long turn-2 prompts raised instead of shrinking the budget.
+- verifier labels: `state_dependent` now needs replay evidence; empty launch grids are no longer
+  infrastructure errors; launch-based hack labels need a correct output or selective skipping. The
+  first two were flagged to the user. Rewards for wrong outputs are unchanged.
+- `l1_row_max` inputs are now all-negative.
+- New fixtures from real model failures. The verdict suite now passes 261/261 on L40S.
+
 ### Open issues and decisions
+- **Policy (user):** should a host-side dtype cast after a correct Triton kernel (e.g.
+  `out.to(torch.bfloat16)`) count as a violation? It is currently a `low_triton_time_fraction` hack,
+  documented by `tests/fixtures/hacks/host_dtype_cast.py`.
 - Clock locking for benchmarks (`nvidia-smi -lgc`) needs root, so ask before changing system state.
 - The Docker image is over 20 GB, so the setup script requires an explicit flag.
 - Phase 0 shares one GPU between SGLang (mem-fraction 0.5) and the sandbox. The eval runs
