@@ -1,0 +1,187 @@
+{
+  "created_utc": "2026-10-10T17:02:24+00:00",
+  "env": {
+    "git": {
+      "commit": null,
+      "dirty": null
+    },
+    "python": "3.12.3",
+    "platform": "Linux-6.12.0-204.92.4.4.3.el9uek.x86_64-x86_64-with-glibc2.39",
+    "hostname": "modal",
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA H100 80GB HBM3",
+        "driver": "580.95.05",
+        "memory_mib": 81559,
+        "max_sm_clock_mhz": "1980",
+        "uuid": "GPU-e87e971e-346c-37de-b3f2-0c921d9aeba1",
+        "driver_cuda_version": "13.0"
+      }
+    ],
+    "libs": {
+      "torch": "2.11.0+cu129",
+      "triton": "3.6.0",
+      "sglang": "0.5.15.post1",
+      "openai": "2.6.1",
+      "numpy": "2.4.4",
+      "ray": null,
+      "transformers": "5.12.1"
+    }
+  },
+  "label": "radix_on",
+  "server": {
+    "version": "0.5.15.post1",
+    "model_path": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "disable_radix_cache": false,
+    "mem_fraction_static": 0.5,
+    "context_length": 32768,
+    "random_seed": 0,
+    "reasoning_parser": "qwen3",
+    "enable_metrics": true,
+    "tp_size": 1,
+    "dtype": "auto",
+    "max_running_requests": null
+  },
+  "k": 8,
+  "max_tokens": 256,
+  "concurrency": 64,
+  "reps": [
+    {
+      "turn1": {
+        "n_requests": 240,
+        "wall_s": 10.243922933994327,
+        "req_per_s": 23.428524555135326,
+        "output_tok_per_s": 5997.702286114643,
+        "ttft_mean_s": 0.46831053688850566,
+        "ttft_p50_s": 0.3223774560174206,
+        "ttft_p95_s": 1.3053264360525645,
+        "latency_p50_s": 2.3025008234835695,
+        "prompt_tokens": 322192,
+        "cached_tokens_reported": 201736,
+        "cache_hit_rate_reported": 0.6261359686149873
+      },
+      "turn2": {
+        "n_requests": 240,
+        "wall_s": 9.848215170990443,
+        "req_per_s": 24.36989808132543,
+        "output_tok_per_s": 6238.69390881931,
+        "ttft_mean_s": 0.23985734229257408,
+        "ttft_p50_s": 0.23390833851590287,
+        "ttft_p95_s": 0.37646805900731123,
+        "latency_p50_s": 2.4972962280007778,
+        "prompt_tokens": 460672,
+        "cached_tokens_reported": 440132,
+        "cache_hit_rate_reported": 0.9554129619338705
+      },
+      "metrics_delta": {
+        "sglang:cached_tokens_total": 641868.0,
+        "sglang:prompt_tokens_total": 782864.0,
+        "sglang:generation_tokens_total": 122880.0,
+        "sglang:num_requests_total": 480.0
+      },
+      "cache_hit_rate_metrics": 0.8198971979807476
+    },
+    {
+      "turn1": {
+        "n_requests": 240,
+        "wall_s": 9.272418056993047,
+        "req_per_s": 25.88321606347305,
+        "output_tok_per_s": 6626.103312249101,
+        "ttft_mean_s": 0.31082544615140556,
+        "ttft_p50_s": 0.29045791500539053,
+        "ttft_p95_s": 0.5776951134699629,
+        "latency_p50_s": 2.292192998487735,
+        "prompt_tokens": 322192,
+        "cached_tokens_reported": 241040,
+        "cache_hit_rate_reported": 0.7481253414113324
+      },
+      "turn2": {
+        "n_requests": 240,
+        "wall_s": 10.093382872990333,
+        "req_per_s": 23.77795462829758,
+        "output_tok_per_s": 6087.15638484418,
+        "ttft_mean_s": 0.2742311802577509,
+        "ttft_p50_s": 0.2543688985169865,
+        "ttft_p95_s": 0.6142438993949326,
+        "latency_p50_s": 2.496904995001387,
+        "prompt_tokens": 460672,
+        "cached_tokens_reported": 440132,
+        "cache_hit_rate_reported": 0.9554129619338705
+      },
+      "metrics_delta": {
+        "sglang:cached_tokens_total": 681172.0,
+        "sglang:prompt_tokens_total": 782864.0,
+        "sglang:generation_tokens_total": 122880.0,
+        "sglang:num_requests_total": 480.0
+      },
+      "cache_hit_rate_metrics": 0.8701025976414805
+    },
+    {
+      "turn1": {
+        "n_requests": 240,
+        "wall_s": 9.150107287015999,
+        "req_per_s": 26.229200649981447,
+        "output_tok_per_s": 6714.67536639525,
+        "ttft_mean_s": 0.29441528154929986,
+        "ttft_p50_s": 0.2850469984987285,
+        "ttft_p95_s": 0.5015294214288588,
+        "latency_p50_s": 2.2710497679945547,
+        "prompt_tokens": 322192,
+        "cached_tokens_reported": 243844,
+        "cache_hit_rate_reported": 0.7568282266474649
+      },
+      "turn2": {
+        "n_requests": 240,
+        "wall_s": 9.827593505993718,
+        "req_per_s": 24.421034493706642,
+        "output_tok_per_s": 6251.7848303889,
+        "ttft_mean_s": 0.23330565110578996,
+        "ttft_p50_s": 0.22565767250489444,
+        "ttft_p95_s": 0.3632966789940838,
+        "latency_p50_s": 2.493376567508676,
+        "prompt_tokens": 460672,
+        "cached_tokens_reported": 437812,
+        "cache_hit_rate_reported": 0.9503768407891081
+      },
+      "metrics_delta": {
+        "sglang:cached_tokens_total": 681656.0,
+        "sglang:prompt_tokens_total": 782864.0,
+        "sglang:generation_tokens_total": 122880.0,
+        "sglang:num_requests_total": 480.0
+      },
+      "cache_hit_rate_metrics": 0.870720840401398
+    }
+  ],
+  "tasks": "all",
+  "median": {
+    "turn1": {
+      "n_requests": 240,
+      "wall_s": 9.272418056993047,
+      "req_per_s": 25.88321606347305,
+      "output_tok_per_s": 6626.103312249101,
+      "ttft_mean_s": 0.31082544615140556,
+      "ttft_p50_s": 0.29045791500539053,
+      "ttft_p95_s": 0.5776951134699629,
+      "latency_p50_s": 2.292192998487735,
+      "prompt_tokens": 322192,
+      "cached_tokens_reported": 241040,
+      "cache_hit_rate_reported": 0.7481253414113324
+    },
+    "turn2": {
+      "n_requests": 240,
+      "wall_s": 9.848215170990443,
+      "req_per_s": 24.36989808132543,
+      "output_tok_per_s": 6238.69390881931,
+      "ttft_mean_s": 0.23985734229257408,
+      "ttft_p50_s": 0.23390833851590287,
+      "ttft_p95_s": 0.37646805900731123,
+      "latency_p50_s": 2.496904995001387,
+      "prompt_tokens": 460672,
+      "cached_tokens_reported": 440132,
+      "cache_hit_rate_reported": 0.9554129619338705
+    },
+    "cache_hit_rate_metrics": 0.8701025976414805
+  }
+}

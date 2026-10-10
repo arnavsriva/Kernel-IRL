@@ -123,7 +123,7 @@ async def bench(args) -> dict:
         print(f"rep {rep}: turn1 ttft_p50={p1['ttft_p50_s']:.3f}s tok/s={p1['output_tok_per_s']:.0f} | "
               f"turn2 ttft_p50={p2['ttft_p50_s']:.3f}s tok/s={p2['output_tok_per_s']:.0f} | "
               f"hit={reps[-1]['cache_hit_rate_metrics']}", flush=True)
-    return {"reps": reps, "median": _median_reps(reps)}
+    return {"repetitions": reps, "median": _median_reps(reps)}
 
 
 def _median_reps(reps: list[dict]) -> dict:
@@ -150,6 +150,12 @@ def cmd_run(args) -> int:
     return 0
 
 
+def _n_reps(doc: dict) -> int:
+    # Early result files stored the repetition list under "reps", which overwrote the count.
+    r = doc.get("reps")
+    return r if isinstance(r, int) else len(r or doc.get("repetitions", []))
+
+
 def _ratio(a, b):
     return a / b if a and b else None
 
@@ -160,7 +166,7 @@ def cmd_compare(args) -> int:
     lines = ["# Prefix caching: radix cache on vs off", "",
              f"Workload: {on['tasks'] if on['tasks'] != 'all' else 'all 30'} tasks, k={on['k']} samples per prompt, "
              f"{on['max_tokens']} output tokens (ignore_eos), concurrency {on['concurrency']}, "
-             f"median of {on['reps']} repetitions, cache flushed before each repetition. "
+             f"median of {_n_reps(on)} repetitions, cache flushed before each repetition. "
              f"Server: sglang {on['server'].get('version')}, model {on['server'].get('model_path')}.", "",
              "| Phase | Metric | Radix on | Radix off | On/Off |", "|---|---|---|---|---|"]
     for ph in ("turn1", "turn2"):
@@ -170,8 +176,9 @@ def cmd_compare(args) -> int:
             r = _ratio(a, b)
             lines.append(f"| {ph} | {k} | {fmt.format(a) if a is not None else '–'} | "
                          f"{fmt.format(b) if b is not None else '–'} | {f'{r:.2f}x' if r else '–'} |")
-    lines.append(f"| all | cache hit rate (/metrics) | {mo['cache_hit_rate_metrics']} | "
-                 f"{mf['cache_hit_rate_metrics']} | |")
+    fmt_hit = lambda x: "–" if x is None else f"{x:.1%}"  # noqa: E731
+    lines.append(f"| all | cache hit rate (/metrics) | {fmt_hit(mo['cache_hit_rate_metrics'])} | "
+                 f"{fmt_hit(mf['cache_hit_rate_metrics'])} | |")
     t1 = _ratio(mf["turn1"]["ttft_p50_s"], mo["turn1"]["ttft_p50_s"])
     t2 = _ratio(mf["turn2"]["ttft_p50_s"], mo["turn2"]["ttft_p50_s"])
     thr = _ratio(mo["turn2"]["output_tok_per_s"], mf["turn2"]["output_tok_per_s"])

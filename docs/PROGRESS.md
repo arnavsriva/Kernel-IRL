@@ -122,6 +122,23 @@ Bugs found and fixed while running:
 - `l1_row_max` inputs are now all-negative.
 - New fixtures from real model failures. The verdict suite now passes 261/261 on L40S.
 
+### CUDA validation and prefix-cache benchmark on H100 (2026-10-10)
+- **Task validation.** All 30 tasks are valid on CUDA with no shapes skipped
+  (`docs/results/task_validation_cuda.json`).
+- **Prefix caching** (`docs/results/prefix_cache.md`). The radix cache cuts median time to first token
+  2.2x on turn 1 (k-way shared prompts) and 3.8x on turn 2 (conversation prefix). Throughput rises
+  1.55x and 1.83x. Hit rates are 75% on turn 1 and 95.5% on turn 2; concurrent arrival leaves about 12%
+  of turn-1 hits unrealized.
+
+### Phase 0 definition of done
+- [x] All task references validate (CPU and CUDA H100).
+- [x] All adversarial tests pass (261/261 on L40S) and the sandbox survives every hostile fixture.
+- [x] Baseline report with pass@k, status breakdown, speedups, and 1-turn vs 2-turn
+  (`docs/results/baseline_phase0.md`).
+- [x] Prefix-caching benchmark results with interpretation.
+- [x] `docs/DESIGN.md` covers verifier decisions and known limitations.
+- [x] `docs/PROGRESS.md` has status, open issues, and the proposed Phase 1 Ray interface (above).
+
 ### Open issues and decisions
 - **Policy decided by the user on 2026-10-10: keep it strict.** A host-side dtype cast after a correct
   Triton kernel (e.g. `out.to(torch.bfloat16)`) is a `low_triton_time_fraction` violation with
