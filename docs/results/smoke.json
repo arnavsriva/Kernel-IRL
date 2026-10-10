@@ -1,0 +1,295 @@
+{
+  "created_utc": "2026-10-10T14:52:24+00:00",
+  "env": {
+    "git": {
+      "commit": null,
+      "dirty": null
+    },
+    "python": "3.12.3",
+    "platform": "Linux-6.12.0-204.92.4.4.3.el9uek.x86_64-x86_64-with-glibc2.39",
+    "hostname": "modal",
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA H100 80GB HBM3",
+        "driver": "580.95.05",
+        "memory_mib": 81559,
+        "max_sm_clock_mhz": "1980",
+        "uuid": "GPU-5a7611be-9212-f2da-4435-a65575efc63a",
+        "driver_cuda_version": "13.0"
+      }
+    ],
+    "libs": {
+      "torch": "2.11.0+cu129",
+      "triton": "3.6.0",
+      "sglang": "0.5.15.post1",
+      "openai": "2.6.1",
+      "numpy": "2.4.4",
+      "ray": null,
+      "transformers": "5.12.1"
+    }
+  },
+  "run_id": "smoke",
+  "model": "Qwen/Qwen3-4B",
+  "k": 2,
+  "turns": 2,
+  "thinking": false,
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "min_p": 0.0,
+    "max_tokens": 8192
+  },
+  "seed": 0,
+  "tasks": [
+    "l1_vector_add",
+    "l2_softmax"
+  ],
+  "server": {
+    "version": "0.5.15.post1",
+    "model_path": "Qwen/Qwen3-4B",
+    "revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+    "disable_radix_cache": false,
+    "mem_fraction_static": 0.5,
+    "context_length": 32768,
+    "random_seed": 0,
+    "reasoning_parser": "qwen3",
+    "enable_metrics": true,
+    "tp_size": 1,
+    "dtype": "auto",
+    "max_running_requests": null
+  },
+  "sandbox_config": {
+    "methodology_version": 1,
+    "timeouts_s": {
+      "compile": 180,
+      "check": 180,
+      "bench": 240,
+      "baseline": 900,
+      "probe": 60
+    },
+    "limits": {
+      "host_rss_gb": 24,
+      "max_file_bytes": 268435456,
+      "max_source_bytes": 65536,
+      "watchdog_interval_s": 0.05
+    },
+    "correctness": {
+      "num_seeds": 2,
+      "fixed_seeds": null,
+      "poison_allocator": true
+    },
+    "hack_checks": {
+      "distinct_inputs": true,
+      "mutation_after_call": true,
+      "same_address_reuse": true,
+      "call_order_permutation": true,
+      "launch_check": true,
+      "min_triton_time_fraction": 0.8,
+      "require_profiler": true,
+      "api_tamper_sentinel": true
+    },
+    "benchmark": {
+      "warmup": 25,
+      "iters": 100,
+      "l2_flush_bytes": 268435456,
+      "input_variants": 2,
+      "verify_iters": 4,
+      "bench_seed": 1234,
+      "inproc_reference_ratio_limit": 2.0,
+      "wall_over_event_limit": 3.0,
+      "wall_over_event_min_ms": 0.1,
+      "wall_iters": 20,
+      "compile_mode": "default"
+    },
+    "feedback": {
+      "max_error_chars": 1500,
+      "include_profiler": false,
+      "max_shapes_listed": 6
+    },
+    "probe_after_failure": true,
+    "child_env_passthrough": [
+      "PATH",
+      "LD_LIBRARY_PATH",
+      "CUDA_HOME",
+      "HOME",
+      "LANG",
+      "LC_ALL",
+      "TRITON_PTXAS_PATH",
+      "NVIDIA_VISIBLE_DEVICES"
+    ]
+  },
+  "summary": {
+    "k": 2,
+    "turn1": {
+      "n_samples": 4,
+      "pass@1": 0.0,
+      "pass@2": 0.0,
+      "by_level": {
+        "1": {
+          "pass@1": 0.0,
+          "pass@2": 0.0
+        },
+        "2": {
+          "pass@1": 0.0,
+          "pass@2": 0.0
+        },
+        "3": {
+          "pass@1": null,
+          "pass@2": null
+        }
+      },
+      "status_counts": {
+        "correct": 0,
+        "incorrect": 0,
+        "hack_detected": 0,
+        "static_reject": 2,
+        "compile_error": 1,
+        "crash": 1,
+        "timeout": 0
+      },
+      "static_reject_reasons": {
+        "forbidden_api": 2
+      },
+      "hack_reasons": {},
+      "hack_detected": 0,
+      "static_rule_violations": 2,
+      "speedup_vs_eager_geomean_correct": null,
+      "speedup_vs_eager_median_correct": null,
+      "speedup_vs_compile_geomean_correct": null,
+      "fast_1_frac": 0.0,
+      "extraction_methods": {
+        "fenced_incomplete": 1,
+        "fenced": 3
+      },
+      "finish_reasons": {
+        "length": 1,
+        "stop": 3
+      },
+      "infra_errors": 0,
+      "per_task": {
+        "l1_vector_add": {
+          "level": 1,
+          "n": 2,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@2": 0.0,
+          "statuses": {
+            "compile_error": 1,
+            "crash": 1
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_softmax": {
+          "level": 2,
+          "n": 2,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@2": 0.0,
+          "statuses": {
+            "static_reject": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        }
+      }
+    },
+    "turn2": {
+      "n_samples": 4,
+      "pass@1": 0.0,
+      "pass@2": 0.0,
+      "by_level": {
+        "1": {
+          "pass@1": 0.0,
+          "pass@2": 0.0
+        },
+        "2": {
+          "pass@1": 0.0,
+          "pass@2": 0.0
+        },
+        "3": {
+          "pass@1": null,
+          "pass@2": null
+        }
+      },
+      "status_counts": {
+        "correct": 0,
+        "incorrect": 0,
+        "hack_detected": 0,
+        "static_reject": 4,
+        "compile_error": 0,
+        "crash": 0,
+        "timeout": 0
+      },
+      "static_reject_reasons": {
+        "forbidden_api": 3,
+        "missing_entrypoint": 1
+      },
+      "hack_reasons": {},
+      "hack_detected": 0,
+      "static_rule_violations": 3,
+      "speedup_vs_eager_geomean_correct": null,
+      "speedup_vs_eager_median_correct": null,
+      "speedup_vs_compile_geomean_correct": null,
+      "fast_1_frac": 0.0,
+      "extraction_methods": {
+        "fenced_incomplete": 1,
+        "fenced": 3
+      },
+      "finish_reasons": {
+        "length": 1,
+        "stop": 3
+      },
+      "infra_errors": 0,
+      "per_task": {
+        "l1_vector_add": {
+          "level": 1,
+          "n": 2,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@2": 0.0,
+          "statuses": {
+            "static_reject": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        },
+        "l2_softmax": {
+          "level": 2,
+          "n": 2,
+          "correct": 0,
+          "pass@1": 0.0,
+          "pass@2": 0.0,
+          "statuses": {
+            "static_reject": 2
+          },
+          "speedup_vs_eager_geomean": null,
+          "best_speedup_vs_eager": null,
+          "speedup_vs_compile_geomean": null,
+          "mean_reward": 0.0
+        }
+      }
+    },
+    "two_turn": {
+      "n_pairs": 4,
+      "turn1_correct_rate": 0.0,
+      "turn2_correct_rate": 0.0,
+      "correct_in_either_rate": 0.0,
+      "transitions": {
+        "static_reject->static_reject": 2,
+        "compile_error->static_reject": 1,
+        "crash->static_reject": 1
+      },
+      "speedup_ratio_t2_over_t1_geomean": null,
+      "n_correct_both": 0
+    }
+  }
+}

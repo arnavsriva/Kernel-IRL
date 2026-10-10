@@ -63,6 +63,25 @@ FORBIDDEN_METHODS = frozenset(_COMPUTE_METHODS | {m + "_" for m in _COMPUTE_METH
 FORBIDDEN_ATTR_STORES = frozenset({"data", "grad"})
 
 
+_TRITON_HOST = ", ".join(sorted(p for p in TRITON_ALLOWED if p != "triton.language"))
+_TORCH_HOST = ("allocation (torch.empty, torch.empty_like, torch.zeros, torch.zeros_like, torch.full, ...), "
+               "dtypes (torch.float16, ...), torch.Tensor/Size/device, and torch.cuda device queries")
+
+
+def _api_message(path: str, shown: str | None = None) -> str:
+    """Actionable rejection text. Models often call Triton APIs that do not exist (triton.launch,
+    triton.grid, ...), so say what *is* available instead of only "not allowed"."""
+    what = f"'{shown or path}'"
+    if path.startswith("triton."):
+        return (f"{what} is not an available Triton host API (it may not exist). Host code may use only: "
+                f"{_TRITON_HOST}; kernels use triton.language (tl.program_id, tl.arange, tl.load, tl.store, ...). "
+                "Launch a kernel as kernel[grid](args...), where grid is a tuple of ints.")
+    if path.startswith("torch."):
+        return (f"{what} is not allowed: host code may not run PyTorch compute ops. Allowed torch APIs: "
+                f"{_TORCH_HOST}. Write the computation inside a @triton.jit kernel.")
+    return f"{what} is not allowed"
+
+
 @dataclass
 class StaticResult:
     ok: bool
@@ -144,7 +163,7 @@ class _Checker(ast.NodeVisitor):
             elif self.path_allowed(path):
                 self.obj_alias[local] = path
             else:
-                self.flag(node, "forbidden_api", f"'from {mod} import {a.name}' is not allowed")
+                self.flag(node, "forbidden_api", _api_message(path, f"from {mod} import {a.name}"))
 
     # ---------- names / attributes ----------
     def visit_Name(self, node: ast.Name) -> None:
@@ -165,7 +184,7 @@ class _Checker(ast.NodeVisitor):
         if is_chain_top:
             path = self.path_of(node)
             if path is not None and not self.path_allowed(path):
-                self.flag(node, "forbidden_api", f"'{path}' is not allowed; write the computation as a Triton kernel")
+                self.flag(node, "forbidden_api", _api_message(path))
             elif path in ("torch", "triton", "triton.language") and not self._as_base(node):
                 self.flag(node, "module_escape", f"module '{path}' may only be used as 'module.attr'")
         self.generic_visit(node)

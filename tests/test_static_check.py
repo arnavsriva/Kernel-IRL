@@ -132,3 +132,13 @@ def test_fixture_static_verdict(fx):
             assert r.reason in fx.reasons, (r.reason, r.message)
     else:
         assert r.ok, f"{fx.id} unexpectedly rejected: {r.reason}: {r.message}"
+
+
+def test_forbidden_api_messages_are_actionable():
+    r = check_source(GOOD.replace("return out.view(x.shape)", "triton.grid(1)\n    return out"), expected_arity=1)
+    assert r.reason == "forbidden_api" and "may not exist" in r.message
+    assert "triton.cdiv" in r.message and "kernel[grid](args...)" in r.message
+    r = check_source("from triton import launch\n" + GOOD, expected_arity=1)
+    assert "'from triton import launch'" in r.message and "triton.jit" in r.message
+    r = check_source(GOOD.replace("return out.view(x.shape)", "return torch.softmax(x, -1)"), expected_arity=1)
+    assert "PyTorch compute ops" in r.message and "torch.empty" in r.message

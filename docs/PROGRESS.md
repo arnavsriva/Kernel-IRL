@@ -86,6 +86,21 @@ kernels on the same GPU.
   The correctness gate and reward are unchanged; only the hack label for trivial outputs is
   affected.
 
+### Smoke eval on Modal H100 (2026-10-10): pipeline works, model scores 0/8
+Run `smoke`: Qwen3-4B non-thinking, l1_vector_add + l2_softmax, k=2, 2 turns
+(`docs/results/smoke.md`). SGLang, generation, sandbox, revision turn, and report all worked
+end to end in about 3 minutes.
+- Every failure is a genuine model failure. The model invented Triton APIs (`triton.launch`,
+  `triton.grid`, `tl.num_blocks_per_grid`, `T.launch_index`), wrote CUDA-style one-thread-per-element
+  code, and passed `data_ptr()` integers. One sample looped on a repeated comment until it hit the
+  8192-token cap.
+- Fix made: forbidden-API messages now say the API may not exist and list the allowed host APIs and
+  the launch syntax. Previously "not allowed" read as a rules problem, and turn 2 repeated the same
+  invented calls.
+- Open decision (asked of the user): a near-zero pass rate gives GRPO no learning signal in Phase 2.
+  Options are a short API cheat-sheet plus one worked example in the prompt, thinking mode, and
+  presence_penalty=1.5 for the repetition loops (the Qwen3 card recommends it).
+
 ### Open issues and decisions
 - Clock locking for benchmarks (`nvidia-smi -lgc`) needs root, so ask before changing system state.
 - The Docker image is over 20 GB, so the setup script requires an explicit flag.
